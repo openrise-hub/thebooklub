@@ -1,0 +1,118 @@
+/* ==========================================================================
+   THE BOOK CLUB - TACTILE DESIGN SYSTEM & THEME TOKENS
+   Strict geometric, solid, tactile Kahoot-inspired aesthetic.
+   Rules: NO gradients, NO blurry shadows/glows, strictly 100% solid colors.
+   ========================================================================== */
+
+:root,
+[data-theme="classic"] {
+	/* Palette - Classic Club (Light / Default) */
+	--bg-app: #f2f4f8;
+	--bg-surface: #ffffff;
+	--bg-surface-elevated: #ffffff;
+	--text-primary: #1a1a1a;
+	--text-muted: #5e6573;
+	--border-color: #1a1a1a;
+	--brand-primary: #46178f;
+	--brand-shadow: #2c0e5b;
+	--brand-text: #ffffff;
+}
+
+[data-theme="midnight"] {
+	/* Palette - Midnight Arcade (Dark Mode) */
+	--bg-app: #0e0f14;
+	--bg-surface: #1a1c24;
+	--bg-surface-elevated: #242834;
+	--text-primary: #f8f9fa;
+	--text-muted: #9a9fa8;
+	--border-color: #3b4050;
+	--brand-primary: #6a2cd8;
+	--brand-shadow: #431692;
+	--brand-text: #ffffff;
+}
+
+[data-theme="bookshelf"] {
+	/* Palette - Cozy Bookshelf (Warm Mode) */
+	--bg-app: #f5efeb;
+	--bg-surface: #fffdfb;
+	--bg-surface-elevated: #f0e6df;
+	--text-primary: #2b231d;
+	--text-muted: #6e6158;
+	--border-color: #2b231d;
+	--brand-primary: #7a3e26;
+	--brand-shadow: #4d2617;
+	--brand-text: #ffffff;
+}
+
+:root {
+	/* Universal Action Colors (Solid Base / Solid Depth Shadow) */
+	--color-red-base: #e21b3c;
+	--color-red-shadow: #9e1329;
+	--color-red-text: #ffffff;
+
+	--color-blue-base: #1368ce;
+	--color-blue-shadow: #0c468c;
+	--color-blue-text: #ffffff;
+
+	--color-yellow-base: #ffa602;
+	--color-yellow-shadow: #b87700;
+	--color-yellow-text: #1a1a1a;
+
+	--color-green-base: #26890c;
+	--color-green-shadow: #195b07;
+	--color-green-text: #ffffff;
+
+	/* Structural Geometry & Tactile Tokens */
+	--border-width: 3px;
+	--border-style: solid;
+	--border-chunky: var(--border-width) var(--border-style) var(--border-color);
+
+	--radius-sm: 10px;
+	--radius-md: 14px;
+	--radius-lg: 20px;
+
+	--depth-card: 0 6px 0 var(--border-color);
+	--depth-button: 0 6px 0 var(--btn-depth-color, var(--border-color));
+	--depth-button-pressed: 0 2px 0 var(--btn-depth-color, var(--border-color));
+
+	--press-offset: 4px;
+
+	/* Typography Stack */
+	--font-sans: "Nunito", "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		sans-serif;
+}
+
+/* Base Document Styles */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	min-height: 100vh;
+	background-color: var(--bg-app);
+	color: var(--text-primary);
+	font-family: var(--font-sans);
+	font-size: 16px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+	color: inherit;
+}
