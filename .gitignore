@@ -1,0 +1,42 @@
+# Node dependencies
+node_modules/
+
+# Build outputs and framework caches
+.svelte-kit/
+build/
+dist/
+.vercel/
+.cloudflare/
+
+# Environment variable files
+.env
+.env.*
+!.env.example
+
+# Runtime logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE directories
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Root markdown rule: ignore all root markdown files by default
+/*.md
+
+# Whitelist public repository documentation only
+!/README.md
+!/CONTRIBUTING.md
+!/CODE_OF_CONDUCT.md
+!/SECURITY.md
