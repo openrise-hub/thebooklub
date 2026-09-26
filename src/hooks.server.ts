@@ -1,8 +1,8 @@
 import { env } from "$env/dynamic/private";
 import {
+	type UserSession,
 	extractSessionToken,
 	isProtectedRoute,
-	type UserSession,
 	verifySessionToken,
 } from "$lib/server/auth";
 import { validateEnv } from "$lib/server/env";
