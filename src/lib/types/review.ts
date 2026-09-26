@@ -1,3 +1,5 @@
+import type { AdvancedCriteriaKey } from "$lib/constants/ratings";
+
 export interface ReviewCriteriaScores {
 	plot: number;
 	characters: number;
@@ -38,6 +40,7 @@ export interface ReviewListResponse {
 	clubId: string;
 	cycleId: string;
 	averageRating: number;
+	criteriaAverages?: Record<AdvancedCriteriaKey, number>;
 	totalReviews: number;
 	reviews: Review[];
 	error?: string;

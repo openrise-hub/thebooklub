@@ -29,6 +29,7 @@ import { MESSAGE_MAX_LENGTH, MESSAGE_MIN_LENGTH, PAGE_REF_BOOK_WIDE } from "./di
 import {
 	ADVANCED_CRITERIA_KEYS,
 	CRITERIA_MAX_SCORE,
+	CRITERIA_METADATA,
 	CRITERIA_MIN_SCORE,
 	REVIEW_COMMENT_MAX_LENGTH,
 	STAR_MAX_RATING,
@@ -96,11 +97,17 @@ describe("Ratings Constants", () => {
 		expect(REVIEW_COMMENT_MAX_LENGTH).toBe(1000);
 	});
 
-	it("defines the 5 advanced review criteria", () => {
+	it("defines the 5 advanced review criteria with complete labels and descriptions", () => {
 		expect(ADVANCED_CRITERIA_KEYS).toHaveLength(5);
 		expect(ADVANCED_CRITERIA_KEYS).toEqual(["plot", "characters", "pacing", "writing", "emotion"]);
 		expect(CRITERIA_MIN_SCORE).toBe(1);
 		expect(CRITERIA_MAX_SCORE).toBe(5);
+
+		for (const key of ADVANCED_CRITERIA_KEYS) {
+			expect(CRITERIA_METADATA[key]).toBeDefined();
+			expect(CRITERIA_METADATA[key].label.length).toBeGreaterThan(0);
+			expect(CRITERIA_METADATA[key].description.length).toBeGreaterThan(0);
+		}
 	});
 });
 
