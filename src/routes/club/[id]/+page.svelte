@@ -1,15 +1,18 @@
 <script lang="ts">
 import { evaluateCycleState, formatCountdown } from "$lib/cadence/engine";
 import { calculateProgressPercent, createProgressSynchronizer } from "$lib/club/progress";
-import { formatRating } from "$lib/club/review";
+import { calculateAverageRating, calculateCriteriaAverages, formatRating } from "$lib/club/review";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import DiscussionFeed from "$lib/components/DiscussionFeed.svelte";
 import PDFViewer from "$lib/components/PDFViewer.svelte";
 import RaceTrack from "$lib/components/RaceTrack.svelte";
+import ReviewBreakdown from "$lib/components/ReviewBreakdown.svelte";
 import ReviewModal from "$lib/components/ReviewModal.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
+import { type AdvancedCriteriaKey, CRITERIA_METADATA } from "$lib/constants/ratings";
 import { ROUTES } from "$lib/constants/routes";
+import type { Review } from "$lib/types/review";
 import { onDestroy } from "svelte";
 import type { PageData } from "./$types";
 
@@ -29,6 +32,66 @@ let members = $derived(
 let activeTab = $state<"discussion" | "reviews" | "selection" | "history" | "settings">(
 	"discussion",
 );
+
+let reviewsList = $state<Review[]>([]);
+let criteriaAverages = $state<Record<AdvancedCriteriaKey, number>>({
+	plot: 0,
+	characters: 0,
+	pacing: 0,
+	writing: 0,
+	emotion: 0,
+});
+let averageRating = $state<number>(0);
+let totalReviewsCount = $state<number>(0);
+
+$effect(() => {
+	if (data.activeCycle) {
+		averageRating = data.activeCycle.averageRating || 0;
+		totalReviewsCount = data.activeCycle.totalReviews || 0;
+	}
+});
+
+async function loadClubReviews(clubId: string) {
+	try {
+		const response = await fetch(ROUTES.API_CLUB_REVIEWS(clubId));
+		const res = await response.json();
+		if (!res.success) return;
+
+		reviewsList = res.reviews || [];
+		if (res.criteriaAverages) {
+			criteriaAverages = res.criteriaAverages;
+		}
+		if (typeof res.averageRating === "number") {
+			averageRating = res.averageRating;
+		}
+		if (typeof res.totalReviews === "number") {
+			totalReviewsCount = res.totalReviews;
+		}
+	} catch {
+		// Silent error handling for network resilience
+	}
+}
+
+$effect(() => {
+	if (activeTab === "reviews" && data.club.id) {
+		loadClubReviews(data.club.id);
+	}
+});
+
+function handleReviewSubmitted(newReview: Review) {
+	const existingIndex = reviewsList.findIndex(
+		(r) =>
+			r.id === newReview.id || (r.userId === newReview.userId && r.cycleId === newReview.cycleId),
+	);
+	if (existingIndex >= 0) {
+		reviewsList[existingIndex] = newReview;
+	} else {
+		reviewsList = [newReview, ...reviewsList];
+	}
+	averageRating = calculateAverageRating(reviewsList);
+	criteriaAverages = calculateCriteriaAverages(reviewsList);
+	totalReviewsCount = reviewsList.length;
+}
 
 const tabs = [
 	{ id: "discussion", label: "Discussion" },
@@ -271,12 +334,12 @@ onDestroy(() => {
 														<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
 													</svg>
 												</span>
-												<span class="score-number">{formatRating(data.activeCycle.averageRating || 0)}</span>
+												<span class="score-number">{formatRating(averageRating)}</span>
 												<span class="score-max">/ 5.0</span>
 											</div>
 											<div class="score-meta">
 												<h3 class="reviews-title">Club Book Reviews</h3>
-												<p class="reviews-count">{data.activeCycle.totalReviews || 0} reviews submitted</p>
+												<p class="reviews-count">{totalReviewsCount} reviews submitted</p>
 											</div>
 										</div>
 
@@ -289,8 +352,69 @@ onDestroy(() => {
 										</Button>
 									</div>
 
-									<div class="reviews-note">
-										<p>Reviews submitted by club members appear here. Standard 1.0 to 5.0 star ratings and feedback are tracked for this reading cycle.</p>
+									{#if data.club.advancedReviews}
+										<div class="rubric-breakdown-wrapper">
+											<ReviewBreakdown
+												{criteriaAverages}
+												totalReviews={totalReviewsCount}
+											/>
+										</div>
+									{/if}
+
+									<div class="reviews-list-section">
+										<h4 class="member-reviews-heading">Member Reviews & Ratings</h4>
+										{#if reviewsList.length === 0}
+											<div class="no-reviews-box">
+												<p>No reviews submitted yet for this cycle. Be the first to review!</p>
+											</div>
+										{:else}
+											<div class="reviews-cards-stack">
+												{#each reviewsList as rev (rev.id)}
+													<div class="review-item-card">
+														<div class="review-item-header">
+															<div class="reviewer-profile">
+																<img
+																	src={rev.avatarUrl}
+																	alt={rev.username}
+																	class="reviewer-avatar"
+																/>
+																<div class="reviewer-info">
+																	<span class="reviewer-username">{rev.username}</span>
+																	<span class="review-date">
+																		{new Date(rev.createdAt).toLocaleDateString()}
+																	</span>
+																</div>
+															</div>
+
+															<div class="review-item-rating">
+																<span class="star-mini-icon" aria-hidden="true">
+																	<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+																		<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+																	</svg>
+																</span>
+																<span class="rating-val">{formatRating(rev.rating)}</span>
+																<span class="rating-max">/ 5.0</span>
+															</div>
+														</div>
+
+														{#if rev.criteria}
+															<div class="review-criteria-pills">
+																{#each Object.entries(rev.criteria) as [key, score]}
+																	<span class="criteria-pill">
+																		<span class="crit-name">{CRITERIA_METADATA[key as AdvancedCriteriaKey]?.label || key}:</span>
+																		<span class="crit-val">{score}/5</span>
+																	</span>
+																{/each}
+															</div>
+														{/if}
+
+														{#if rev.comment}
+															<p class="review-comment-text">{rev.comment}</p>
+														{/if}
+													</div>
+												{/each}
+											</div>
+										{/if}
 									</div>
 								</div>
 							{:else}
@@ -355,7 +479,9 @@ onDestroy(() => {
 		clubId={data.club.id}
 		cycleId={data.activeCycle.id}
 		bookTitle={data.activeCycle.book.title}
+		enableAdvancedCriteria={data.club.advancedReviews}
 		onclose={() => (isReviewModalOpen = false)}
+		onsubmit={handleReviewSubmitted}
 	/>
 {/if}
 
@@ -767,10 +893,152 @@ onDestroy(() => {
 		margin: 0;
 	}
 
-	.reviews-note {
+
+	.rubric-breakdown-wrapper {
+		margin-top: 4px;
+	}
+
+	.reviews-list-section {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-top: 8px;
+	}
+
+	.member-reviews-heading {
+		font-size: 1.05rem;
+		font-weight: 800;
+		color: var(--text-primary);
+		margin: 0;
+	}
+
+	.no-reviews-box {
+		padding: 24px;
+		text-align: center;
+		background-color: var(--bg-surface-elevated);
+		border: 2px dashed var(--border-color);
+		border-radius: var(--radius-sm);
+		color: var(--text-muted);
+		font-weight: 600;
 		font-size: 0.9rem;
+	}
+
+	.reviews-cards-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.review-item-card {
+		background-color: var(--bg-surface-elevated);
+		border: 2px solid var(--border-color);
+		border-radius: var(--radius-sm);
+		padding: 14px 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.review-item-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.reviewer-profile {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.reviewer-avatar {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		border: 2px solid var(--border-color);
+		background-color: var(--bg-primary);
+	}
+
+	.reviewer-info {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+	}
+
+	.reviewer-username {
+		font-weight: 800;
+		font-size: 0.95rem;
+		color: var(--text-primary);
+	}
+
+	.review-date {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--text-muted);
+	}
+
+	.review-item-rating {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		background-color: var(--bg-primary);
+		border: 2px solid var(--border-color);
+		border-radius: 4px;
+		padding: 3px 8px;
+	}
+
+	.star-mini-icon {
+		color: var(--color-yellow);
+		display: flex;
+		align-items: center;
+	}
+
+	.rating-val {
+		font-weight: 900;
+		font-size: 0.95rem;
+		color: var(--text-primary);
+	}
+
+	.rating-max {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--text-muted);
+	}
+
+	.review-criteria-pills {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.criteria-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 2px 8px;
+		background-color: var(--bg-primary);
+		border: 2px solid var(--border-color);
+		border-radius: 4px;
+		font-size: 0.75rem;
+	}
+
+	.crit-name {
+		font-weight: 700;
 		color: var(--text-secondary);
+	}
+
+	.crit-val {
+		font-weight: 900;
+		color: var(--brand-primary);
+	}
+
+	.review-comment-text {
+		font-size: 0.9rem;
 		line-height: 1.5;
+		color: var(--text-primary);
+		margin: 0;
 	}
 
 	.panel-placeholder {

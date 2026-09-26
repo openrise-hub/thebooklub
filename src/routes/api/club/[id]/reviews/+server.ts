@@ -1,4 +1,8 @@
-import { calculateAverageRating, validateReview } from "$lib/club/review";
+import {
+	calculateAverageRating,
+	calculateCriteriaAverages,
+	validateReview,
+} from "$lib/club/review";
 import type { Review, ReviewPostRequest } from "$lib/types/review";
 import { type RequestHandler, json } from "@sveltejs/kit";
 
@@ -13,6 +17,13 @@ const mockReviewsStore: Record<string, Review[]> = {
 			avatarUrl: "https://gravatar.com/avatar/alice?d=identicon",
 			rating: 4.5,
 			comment: "Brilliant cyberpunk classic! The prose still holds up extraordinarily well.",
+			criteria: {
+				plot: 5,
+				characters: 4,
+				pacing: 4,
+				writing: 5,
+				emotion: 4,
+			},
 			createdAt: Date.now() - 3600000 * 24,
 			updatedAt: Date.now() - 3600000 * 24,
 		},
@@ -25,6 +36,13 @@ const mockReviewsStore: Record<string, Review[]> = {
 			avatarUrl: "https://gravatar.com/avatar/bob?d=identicon",
 			rating: 4.0,
 			comment: "Fascinating vision of the future with tight narrative momentum.",
+			criteria: {
+				plot: 4,
+				characters: 4,
+				pacing: 5,
+				writing: 4,
+				emotion: 3,
+			},
 			createdAt: Date.now() - 3600000 * 12,
 			updatedAt: Date.now() - 3600000 * 12,
 		},
@@ -48,12 +66,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 	const reviews = mockReviewsStore[clubId] ?? [];
 	const averageRating = calculateAverageRating(reviews);
+	const criteriaAverages = calculateCriteriaAverages(reviews);
 
 	return json({
 		success: true,
 		clubId,
 		cycleId: "cycle-active",
 		averageRating,
+		criteriaAverages,
 		totalReviews: reviews.length,
 		reviews: [...reviews].sort((a, b) => b.createdAt - a.createdAt),
 	});
@@ -81,7 +101,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ success: false, error: "Invalid JSON request body" }, { status: 400 });
 	}
 
-	const validation = validateReview(body.rating, body.comment);
+	const validation = validateReview(body.rating, body.comment, body.criteria);
 	if (!validation.valid) {
 		return json({ success: false, error: validation.error }, { status: 400 });
 	}
