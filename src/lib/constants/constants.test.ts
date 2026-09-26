@@ -30,6 +30,7 @@ import {
 	ADVANCED_CRITERIA_KEYS,
 	CRITERIA_MAX_SCORE,
 	CRITERIA_MIN_SCORE,
+	REVIEW_COMMENT_MAX_LENGTH,
 	STAR_MAX_RATING,
 	STAR_MIN_RATING,
 	STAR_STEP_INCREMENT,
@@ -92,6 +93,7 @@ describe("Ratings Constants", () => {
 		expect(STAR_MIN_RATING).toBe(1.0);
 		expect(STAR_MAX_RATING).toBe(5.0);
 		expect(STAR_STEP_INCREMENT).toBe(0.5);
+		expect(REVIEW_COMMENT_MAX_LENGTH).toBe(1000);
 	});
 
 	it("defines the 5 advanced review criteria", () => {
@@ -134,6 +136,7 @@ describe("Application Routes", () => {
 		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
 		expect(ROUTES.API_CLUB_CADENCE("abc")).toBe("/api/club/abc/cadence");
 		expect(ROUTES.API_CLUB_DISCUSSIONS("abc")).toBe("/api/club/abc/discussions");
+		expect(ROUTES.API_CLUB_REVIEWS("abc")).toBe("/api/club/abc/reviews");
 		expect(ROUTES.API_CRON_PURGE).toBe("/api/cron/purge");
 	});
 });
