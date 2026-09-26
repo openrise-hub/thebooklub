@@ -12,5 +12,6 @@ export const ROUTES = {
 	API_CLUB_PROGRESS: (id: string) => `/api/club/${id}/progress`,
 	API_CLUB_CADENCE: (id: string) => `/api/club/${id}/cadence`,
 	API_CLUB_DISCUSSIONS: (id: string) => `/api/club/${id}/discussions`,
+	API_CLUB_REVIEWS: (id: string) => `/api/club/${id}/reviews`,
 	API_CRON_PURGE: "/api/cron/purge",
 } as const;

@@ -12,6 +12,7 @@ interface Props {
 	children?: Snippet;
 	ariaLabel?: string;
 	id?: string;
+	form?: string;
 }
 
 const {
@@ -24,11 +25,13 @@ const {
 	children,
 	ariaLabel,
 	id,
+	form,
 }: Props = $props();
 </script>
 
 <button
 	{id}
+	{form}
 	{type}
 	{disabled}
 	aria-label={ariaLabel}

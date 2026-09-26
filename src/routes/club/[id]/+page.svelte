@@ -1,11 +1,13 @@
 <script lang="ts">
 import { evaluateCycleState, formatCountdown } from "$lib/cadence/engine";
 import { calculateProgressPercent, createProgressSynchronizer } from "$lib/club/progress";
+import { formatRating } from "$lib/club/review";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import DiscussionFeed from "$lib/components/DiscussionFeed.svelte";
 import PDFViewer from "$lib/components/PDFViewer.svelte";
 import RaceTrack from "$lib/components/RaceTrack.svelte";
+import ReviewModal from "$lib/components/ReviewModal.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { ROUTES } from "$lib/constants/routes";
 import { onDestroy } from "svelte";
@@ -14,6 +16,7 @@ import type { PageData } from "./$types";
 let { data }: { data: PageData } = $props();
 
 let isPdfReaderOpen = $state(false);
+let isReviewModalOpen = $state(false);
 
 let currentMemberPage = $state<number | null>(null);
 
@@ -181,6 +184,14 @@ onDestroy(() => {
 										</Button>
 									{/if}
 
+									<Button
+										variant="yellow"
+										size="md"
+										onclick={() => (isReviewModalOpen = true)}
+									>
+										Rate & Review
+									</Button>
+
 									{#if data.activeCycle.book.buyUrl}
 										<a
 											href={data.activeCycle.book.buyUrl}
@@ -250,12 +261,44 @@ onDestroy(() => {
 								</div>
 							{/if}
 						{:else if activeTab === "reviews"}
-							<div class="panel-placeholder">
-								<h3 class="panel-heading">Reviews & Scores</h3>
-								<p class="panel-text">
-									Standard star ratings and 5-criteria rubrics will appear here in Phase 5.
-								</p>
-							</div>
+							{#if data.activeCycle}
+								<div class="reviews-panel">
+									<div class="reviews-header-card">
+										<div class="reviews-score-summary">
+											<div class="score-pill">
+												<span class="score-icon" aria-hidden="true">
+													<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+														<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+													</svg>
+												</span>
+												<span class="score-number">{formatRating(data.activeCycle.averageRating || 0)}</span>
+												<span class="score-max">/ 5.0</span>
+											</div>
+											<div class="score-meta">
+												<h3 class="reviews-title">Club Book Reviews</h3>
+												<p class="reviews-count">{data.activeCycle.totalReviews || 0} reviews submitted</p>
+											</div>
+										</div>
+
+										<Button
+											variant="yellow"
+											size="md"
+											onclick={() => (isReviewModalOpen = true)}
+										>
+											Rate this Book &rarr;
+										</Button>
+									</div>
+
+									<div class="reviews-note">
+										<p>Reviews submitted by club members appear here. Standard 1.0 to 5.0 star ratings and feedback are tracked for this reading cycle.</p>
+									</div>
+								</div>
+							{:else}
+								<div class="panel-placeholder">
+									<h3 class="panel-heading">No Active Cycle</h3>
+									<p class="panel-text">Reviews unlock when an active reading cycle is running.</p>
+								</div>
+							{/if}
 						{:else if activeTab === "selection"}
 							<div class="panel-placeholder">
 								<h3 class="panel-heading">Book Selection Polls & Roulette</h3>
@@ -303,6 +346,16 @@ onDestroy(() => {
 		totalPages={data.activeCycle.book.pageCount || 1}
 		onclose={() => (isPdfReaderOpen = false)}
 		onpagechange={handleReaderPageChange}
+	/>
+{/if}
+
+{#if isReviewModalOpen && data.activeCycle}
+	<ReviewModal
+		isOpen={isReviewModalOpen}
+		clubId={data.club.id}
+		cycleId={data.activeCycle.id}
+		bookTitle={data.activeCycle.book.title}
+		onclose={() => (isReviewModalOpen = false)}
 	/>
 {/if}
 
@@ -640,6 +693,84 @@ onDestroy(() => {
 		color: #ffffff;
 		border-color: var(--border-color);
 		box-shadow: 0 4px 0 var(--brand-shadow);
+	}
+
+	.reviews-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.reviews-header-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background-color: var(--bg-surface-elevated);
+		border: var(--border-chunky);
+		border-radius: var(--radius-md);
+		padding: 16px 20px;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.reviews-score-summary {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.score-pill {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		background-color: var(--bg-primary);
+		border: 2px solid var(--border-color);
+		border-radius: var(--radius-sm);
+		padding: 6px 12px;
+	}
+
+	.score-icon {
+		color: var(--color-yellow);
+		display: flex;
+		align-items: center;
+	}
+
+	.score-number {
+		font-size: 1.4rem;
+		font-weight: 900;
+		color: var(--text-primary);
+	}
+
+	.score-max {
+		font-size: 0.85rem;
+		font-weight: 700;
+		color: var(--text-muted);
+	}
+
+	.score-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.reviews-title {
+		font-size: 1.1rem;
+		font-weight: 800;
+		color: var(--text-primary);
+		margin: 0;
+	}
+
+	.reviews-count {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	.reviews-note {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
 	}
 
 	.panel-placeholder {
