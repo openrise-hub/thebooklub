@@ -3,6 +3,7 @@ import { evaluateCycleState, formatCountdown } from "$lib/cadence/engine";
 import { calculateProgressPercent, createProgressSynchronizer } from "$lib/club/progress";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
+import DiscussionFeed from "$lib/components/DiscussionFeed.svelte";
 import PDFViewer from "$lib/components/PDFViewer.svelte";
 import RaceTrack from "$lib/components/RaceTrack.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
@@ -232,12 +233,22 @@ onDestroy(() => {
 				>
 					<Card padding="lg">
 						{#if activeTab === "discussion"}
-							<div class="panel-placeholder">
-								<h3 class="panel-heading">Club Discussion Feed</h3>
-								<p class="panel-text">
-									Page-indexed comments and anti-spoiler threads will appear here in Phase 5.
-								</p>
-							</div>
+							{#if data.activeCycle}
+								<DiscussionFeed
+									clubId={data.club.id}
+									cycleId={data.activeCycle.id}
+									currentUser={data.members.length > 0 ? { id: data.members[0].id, email: "user@example.com", username: data.members[0].username, isEmailVerified: true, avatarUrl: data.members[0].avatarUrl, createdAt: 1000 } : null}
+									currentReadingPage={userProgress?.page || 0}
+									totalPages={data.activeCycle.book.pageCount || 1}
+								/>
+							{:else}
+								<div class="panel-placeholder">
+									<h3 class="panel-heading">No Active Reading Cycle</h3>
+									<p class="panel-text">
+										Discussions will unlock when a new reading cycle begins.
+									</p>
+								</div>
+							{/if}
 						{:else if activeTab === "reviews"}
 							<div class="panel-placeholder">
 								<h3 class="panel-heading">Reviews & Scores</h3>
