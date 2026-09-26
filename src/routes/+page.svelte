@@ -1,23 +1,37 @@
 <script lang="ts">
-import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
+import { resolvePendingClubJoin, setPendingClubCode } from "$lib/club/join";
 import { normalizeInviteCode, validateInviteCode } from "$lib/club/validation";
+import AuthModal from "$lib/components/AuthModal.svelte";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import Input from "$lib/components/Input.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { ROUTES } from "$lib/constants/routes";
-import { STORAGE_KEYS } from "$lib/constants/ui";
+import type { PageData } from "./$types";
+
+let { data }: { data: PageData } = $props();
 
 let clubCode = $state("");
 let errorMessage = $state("");
 let isSubmitting = $state(false);
+let isAuthModalOpen = $state(false);
+let pendingInviteCode = $state("");
 
 $effect(() => {
 	const joinParam = page.url.searchParams.get("join");
 	if (joinParam && clubCode === "") {
-		clubCode = normalizeInviteCode(joinParam);
+		const normalized = normalizeInviteCode(joinParam);
+		clubCode = normalized;
+		const validation = validateInviteCode(normalized);
+		if (validation.valid) {
+			pendingInviteCode = validation.normalized;
+			setPendingClubCode(validation.normalized);
+			if (!data.user) {
+				isAuthModalOpen = true;
+			}
+		}
 	}
 });
 
@@ -29,7 +43,7 @@ function handleCodeInput(event: Event) {
 	}
 }
 
-function handleJoinSubmit(event?: SubmitEvent) {
+async function handleJoinSubmit(event?: SubmitEvent) {
 	event?.preventDefault();
 
 	const result = validateInviteCode(clubCode);
@@ -39,13 +53,33 @@ function handleJoinSubmit(event?: SubmitEvent) {
 	}
 
 	errorMessage = "";
-	isSubmitting = true;
+	pendingInviteCode = result.normalized;
+	setPendingClubCode(result.normalized);
 
-	if (browser) {
-		sessionStorage.setItem(STORAGE_KEYS.PENDING_CLUB_CODE, result.normalized);
+	if (!data.user) {
+		isAuthModalOpen = true;
+		return;
 	}
 
-	goto(ROUTES.CLUB_DASHBOARD(result.normalized));
+	isSubmitting = true;
+	const joinRes = await resolvePendingClubJoin();
+	if (joinRes?.success) {
+		goto(joinRes.redirectUrl || ROUTES.CLUB_DASHBOARD(result.normalized));
+	} else {
+		goto(ROUTES.CLUB_DASHBOARD(result.normalized));
+	}
+}
+
+async function handleAuthSuccess() {
+	isAuthModalOpen = false;
+	const joinRes = await resolvePendingClubJoin();
+	if (joinRes?.success && joinRes.redirectUrl) {
+		goto(joinRes.redirectUrl);
+	} else if (pendingInviteCode) {
+		goto(ROUTES.CLUB_DASHBOARD(pendingInviteCode));
+	} else {
+		goto(ROUTES.HOME);
+	}
 }
 </script>
 
@@ -60,7 +94,30 @@ function handleJoinSubmit(event?: SubmitEvent) {
 				<span class="brand-badge" aria-hidden="true">📚</span>
 				<span class="brand-title">The Book Club</span>
 			</div>
-			<ThemeSwitch />
+			<div class="header-actions">
+				{#if data.user}
+					<div class="user-greeting">
+						<img
+							src={data.user.avatarUrl}
+							alt={data.user.username}
+							class="user-avatar"
+						/>
+						<span class="user-name">{data.user.username}</span>
+					</div>
+				{:else}
+					<Button
+						variant="neutral"
+						size="sm"
+						onclick={() => {
+							pendingInviteCode = "";
+							isAuthModalOpen = true;
+						}}
+					>
+						Sign In
+					</Button>
+				{/if}
+				<ThemeSwitch />
+			</div>
 		</div>
 	</header>
 
@@ -111,6 +168,13 @@ function handleJoinSubmit(event?: SubmitEvent) {
 			</div>
 		</div>
 	</main>
+
+	<AuthModal
+		isOpen={isAuthModalOpen}
+		pendingCode={pendingInviteCode}
+		onclose={() => (isAuthModalOpen = false)}
+		onsuccess={handleAuthSuccess}
+	/>
 </div>
 
 <style>
@@ -134,6 +198,29 @@ function handleJoinSubmit(event?: SubmitEvent) {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.user-greeting {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-family: var(--font-sans);
+		font-weight: 800;
+		font-size: 0.95rem;
+		color: var(--text-primary);
+	}
+
+	.user-avatar {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 2px solid var(--border-color);
 	}
 
 	.brand {
