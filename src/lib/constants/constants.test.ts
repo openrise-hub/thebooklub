@@ -8,6 +8,7 @@ import {
 } from "./books";
 import {
 	CADENCE_TYPES,
+	CYCLE_STATUSES,
 	PROGRESS_DEBOUNCE_MS,
 	PURGE_DELAY_HOURS,
 	PURGE_DELAY_MS,
@@ -62,8 +63,9 @@ describe("Cadence Constants", () => {
 		expect(PURGE_DELAY_MS).toBe(24 * 60 * 60 * 1000);
 	});
 
-	it("defines supported cadence types", () => {
+	it("defines supported cadence types and cycle statuses", () => {
 		expect(CADENCE_TYPES).toEqual(["weekly", "monthly", "custom"]);
+		expect(CYCLE_STATUSES).toEqual(["active", "completed", "purged"]);
 	});
 
 	it("defines UI timing thresholds", () => {
