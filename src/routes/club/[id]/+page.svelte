@@ -14,11 +14,11 @@ let activeTab = $state<"discussion" | "reviews" | "selection" | "history" | "set
 );
 
 const tabs = [
-	{ id: "discussion", label: "Discussion", icon: "💬" },
-	{ id: "reviews", label: "Reviews", icon: "⭐" },
-	{ id: "selection", label: "Book Selection", icon: "🎲" },
-	{ id: "history", label: "History", icon: "📚" },
-	{ id: "settings", label: "Settings", icon: "⚙️" },
+	{ id: "discussion", label: "Discussion" },
+	{ id: "reviews", label: "Reviews" },
+	{ id: "selection", label: "Book Selection" },
+	{ id: "history", label: "History" },
+	{ id: "settings", label: "Settings" },
 ] as const;
 
 let cycleEvaluation = $derived(data.activeCycle ? evaluateCycleState(data.activeCycle) : null);
@@ -50,7 +50,9 @@ let userProgress = $derived.by(() => {
 		<div class="header-container">
 			<div class="header-left">
 				<a href={ROUTES.HOME} class="brand-link" aria-label="Return home">
-					<span class="brand-icon" aria-hidden="true">📚</span>
+					<span class="brand-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+					</span>
 				</a>
 				<div class="club-title-group">
 					<h1 class="club-name">{data.club.name}</h1>
@@ -95,8 +97,8 @@ let userProgress = $derived.by(() => {
 										class="hero-cover-img"
 									/>
 								{:else}
-									<div class="hero-cover-placeholder">
-										<span aria-hidden="true">📖</span>
+									<div class="hero-cover-placeholder" aria-hidden="true">
+										<svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
 									</div>
 								{/if}
 							</div>
@@ -105,7 +107,7 @@ let userProgress = $derived.by(() => {
 								<div class="hero-top-badges">
 									<span class="status-pill active">Active Reading Cycle</span>
 									<span class="status-pill countdown">
-										⏳ {countdownString}
+										{countdownString}
 									</span>
 								</div>
 
@@ -185,7 +187,6 @@ let userProgress = $derived.by(() => {
 							class:active={activeTab === tab.id}
 							onclick={() => (activeTab = tab.id)}
 						>
-							<span class="tab-icon" aria-hidden="true">{tab.icon}</span>
 							<span class="tab-label">{tab.label}</span>
 						</button>
 					{/each}
@@ -200,28 +201,28 @@ let userProgress = $derived.by(() => {
 					<Card padding="lg">
 						{#if activeTab === "discussion"}
 							<div class="panel-placeholder">
-								<h3 class="panel-heading">💬 Club Discussion Feed</h3>
+								<h3 class="panel-heading">Club Discussion Feed</h3>
 								<p class="panel-text">
 									Page-indexed comments and anti-spoiler threads will appear here in Phase 5.
 								</p>
 							</div>
 						{:else if activeTab === "reviews"}
 							<div class="panel-placeholder">
-								<h3 class="panel-heading">⭐ Reviews & Scores</h3>
+								<h3 class="panel-heading">Reviews & Scores</h3>
 								<p class="panel-text">
 									Standard star ratings and 5-criteria rubrics will appear here in Phase 5.
 								</p>
 							</div>
 						{:else if activeTab === "selection"}
 							<div class="panel-placeholder">
-								<h3 class="panel-heading">🎲 Book Selection Polls & Roulette</h3>
+								<h3 class="panel-heading">Book Selection Polls & Roulette</h3>
 								<p class="panel-text">
 									Synchronized wheel of choice and timed voting will appear here in Phase 7.
 								</p>
 							</div>
 						{:else if activeTab === "history"}
 							<div class="panel-placeholder">
-								<h3 class="panel-heading">📚 Past Cycles Archive</h3>
+								<h3 class="panel-heading">Past Cycles Archive</h3>
 								<p class="panel-text">
 									Browse past completed books, member reviews, rubrics, and discussion logs in read-only archive mode.
 								</p>
@@ -235,7 +236,7 @@ let userProgress = $derived.by(() => {
 							</div>
 						{:else if activeTab === "settings"}
 							<div class="panel-placeholder">
-								<h3 class="panel-heading">⚙️ Club Settings & PDF Upload</h3>
+								<h3 class="panel-heading">Club Settings & PDF Upload</h3>
 								<p class="panel-text">
 									Admin cadence controls and Cloudflare R2 PDF management will appear here in Phase 4.
 								</p>
@@ -582,11 +583,6 @@ let userProgress = $derived.by(() => {
 		color: #ffffff;
 		border-color: var(--border-color);
 		box-shadow: 0 4px 0 var(--brand-shadow);
-	}
-
-	.tab-icon {
-		font-size: 1.1rem;
-		line-height: 1;
 	}
 
 	.panel-placeholder {

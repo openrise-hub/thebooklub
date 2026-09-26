@@ -98,7 +98,10 @@ function closeDiscussionsModal() {
 							<span class="stat-label">Books Read</span>
 						</div>
 						<div class="stat-card">
-							<span class="stat-value">⭐ {averageClubScore}</span>
+							<span class="stat-value star-stat">
+								<svg class="star-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+								{averageClubScore}
+							</span>
 							<span class="stat-label">Avg Rating</span>
 						</div>
 						<div class="stat-card">
@@ -112,7 +115,9 @@ function closeDiscussionsModal() {
 			{#if data.pastCycles.length === 0}
 				<Card padding="lg" class="empty-state-card">
 					<div class="empty-state-content">
-						<span class="empty-icon" aria-hidden="true">📚</span>
+						<div class="empty-icon-box" aria-hidden="true">
+							<svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+						</div>
 						<h3 class="empty-title">No Completed Cycles Yet</h3>
 						<p class="empty-description">
 							Once your club finishes its active reading cycle, past books, community ratings, and full discussion archives will be preserved here permanently.
@@ -137,8 +142,8 @@ function closeDiscussionsModal() {
 											class="cover-image"
 										/>
 									{:else}
-										<div class="cover-placeholder">
-											<span aria-hidden="true">📖</span>
+										<div class="cover-placeholder" aria-hidden="true">
+											<svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
 										</div>
 									{/if}
 								</div>
@@ -152,7 +157,7 @@ function closeDiscussionsModal() {
 											{cycle.status === "purged" ? "PDF Purged" : "Completed"}
 										</span>
 										<span class="badge date-tag">
-											📅 {formatDateRange(cycle.startDate, cycle.endDate)}
+											{formatDateRange(cycle.startDate, cycle.endDate)}
 										</span>
 									</div>
 
@@ -165,7 +170,7 @@ function closeDiscussionsModal() {
 
 									<div class="score-summary-bar">
 										<div class="score-pill">
-											<span class="star-icon" aria-hidden="true">⭐</span>
+											<svg class="star-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
 											<span class="score-number">
 												{cycle.averageRating?.toFixed(1) ?? "N/A"}
 											</span>
@@ -183,7 +188,7 @@ function closeDiscussionsModal() {
 											size="md"
 											onclick={() => openReviewsModal(cycle)}
 										>
-											⭐ Read Reviews ({cycle.reviews?.length ?? cycle.totalReviews ?? 0})
+											Read Reviews ({cycle.reviews?.length ?? cycle.totalReviews ?? 0})
 										</Button>
 
 										<Button
@@ -191,7 +196,7 @@ function closeDiscussionsModal() {
 											size="md"
 											onclick={() => openDiscussionsModal(cycle)}
 										>
-											💬 View Discussion Archive ({cycle.discussions?.length ?? 0})
+											View Discussion Archive ({cycle.discussions?.length ?? 0})
 										</Button>
 
 										{#if cycle.book.buyUrl}
@@ -226,7 +231,7 @@ function closeDiscussionsModal() {
 		<div class="reviews-modal-content">
 			<div class="modal-summary-banner">
 				<div class="banner-score">
-					<span class="banner-star" aria-hidden="true">⭐</span>
+					<svg class="star-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
 					<span class="banner-number">
 						{selectedCycleForReviews.averageRating?.toFixed(1) ?? "N/A"}
 					</span>
@@ -255,7 +260,10 @@ function closeDiscussionsModal() {
 								</div>
 
 								<div class="reviewer-rating">
-									<span class="star-pill">⭐ {review.rating.toFixed(1)}</span>
+									<span class="star-pill">
+										<svg class="star-icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+										{review.rating.toFixed(1)}
+									</span>
 								</div>
 							</div>
 
@@ -311,7 +319,9 @@ function closeDiscussionsModal() {
 	>
 		<div class="discussions-modal-content">
 			<div class="archive-notice">
-				<span class="notice-icon" aria-hidden="true">🔒</span>
+				<span class="notice-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+				</span>
 				<span class="notice-text">
 					Archived Discussion Log &bull; Read-Only Mode &bull; All Spoilers Revealed
 				</span>
@@ -508,6 +518,9 @@ function closeDiscussionsModal() {
 		font-size: 1.35rem;
 		font-weight: 900;
 		color: var(--text-primary);
+		display: flex;
+		align-items: center;
+		gap: 4px;
 	}
 
 	.stat-label {
@@ -559,7 +572,7 @@ function closeDiscussionsModal() {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 2.8rem;
+		color: var(--text-muted);
 	}
 
 	.cycle-details {
@@ -659,6 +672,12 @@ function closeDiscussionsModal() {
 		opacity: 0.8;
 	}
 
+	.star-icon-svg {
+		display: inline-block;
+		vertical-align: middle;
+		flex-shrink: 0;
+	}
+
 	.review-count-text {
 		font-family: var(--font-sans);
 		font-size: 0.85rem;
@@ -687,9 +706,11 @@ function closeDiscussionsModal() {
 		padding: 48px 20px;
 	}
 
-	.empty-icon {
-		font-size: 3.5rem;
-		line-height: 1;
+	.empty-icon-box {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--brand-primary);
 	}
 
 	.empty-title {
@@ -732,7 +753,7 @@ function closeDiscussionsModal() {
 
 	.banner-score {
 		display: flex;
-		align-items: baseline;
+		align-items: center;
 		gap: 6px;
 		font-family: var(--font-sans);
 		font-weight: 900;
@@ -819,6 +840,9 @@ function closeDiscussionsModal() {
 	}
 
 	.star-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 		background-color: var(--color-yellow-base);
 		color: var(--color-yellow-text);
 		border: 1.5px solid var(--color-yellow-shadow);
@@ -883,6 +907,12 @@ function closeDiscussionsModal() {
 		color: var(--text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
+	}
+
+	.notice-icon {
+		display: flex;
+		align-items: center;
+		color: var(--text-muted);
 	}
 
 	.message-tags {
