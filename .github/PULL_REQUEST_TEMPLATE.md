@@ -4,9 +4,6 @@
 ## Linked Issues
 Fixes #
 
-## Roadmap Alignment
-- Task ID: [e.g., Task 1.1]
-
 ## Type of Change
 - [ ] Bug fix
 - [ ] New feature
