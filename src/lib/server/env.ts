@@ -1,8 +1,3 @@
-/**
- * Server-only environment variable validation.
- * Ensures secrets are never leaked to client and validates runtime configuration.
- */
-
 export interface ServerEnv {
 	AUTH_SECRET: string;
 	AUTH_PROVIDER?: "clerk" | "kinde" | "local";
