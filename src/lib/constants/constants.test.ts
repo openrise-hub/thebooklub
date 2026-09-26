@@ -131,6 +131,8 @@ describe("Application Routes", () => {
 		expect(ROUTES.API_CLUB_JOIN).toBe("/api/club/join");
 		expect(ROUTES.API_CLUB_PDF("abc")).toBe("/api/club/abc/pdf");
 		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
+		expect(ROUTES.API_CLUB_CADENCE("abc")).toBe("/api/club/abc/cadence");
+		expect(ROUTES.API_CRON_PURGE).toBe("/api/cron/purge");
 	});
 });
 
