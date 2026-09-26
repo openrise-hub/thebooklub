@@ -1,16 +1,26 @@
 <script lang="ts">
 import { evaluateCycleState, formatCountdown } from "$lib/cadence/engine";
+import { calculateProgressPercent, createProgressSynchronizer } from "$lib/club/progress";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import PDFViewer from "$lib/components/PDFViewer.svelte";
 import RaceTrack from "$lib/components/RaceTrack.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { ROUTES } from "$lib/constants/routes";
+import { onDestroy } from "svelte";
 import type { PageData } from "./$types";
 
 let { data }: { data: PageData } = $props();
 
 let isPdfReaderOpen = $state(false);
+
+let currentMemberPage = $state<number | null>(null);
+
+let members = $derived(
+	data.members.map((m, idx) =>
+		idx === 0 && currentMemberPage !== null ? { ...m, currentPage: currentMemberPage } : m,
+	),
+);
 
 let activeTab = $state<"discussion" | "reviews" | "selection" | "history" | "settings">(
 	"discussion",
@@ -31,16 +41,31 @@ let countdownString = $derived(
 );
 
 let userProgress = $derived.by(() => {
-	if (!data.activeCycle || !data.members) return null;
-	const currentMember = data.members[0];
+	if (!data.activeCycle || members.length === 0) return null;
+	const currentMember = members[0];
 	if (!currentMember) return null;
 	const total = data.activeCycle.book.pageCount || 1;
-	const percent = Math.min(100, Math.round((currentMember.currentPage / total) * 100));
+	const percent = calculateProgressPercent(currentMember.currentPage, total);
 	return {
 		page: currentMember.currentPage,
 		total,
 		percent,
 	};
+});
+
+const progressSynchronizer = createProgressSynchronizer(() => data.club.id, {
+	onSync: (res) => {
+		currentMemberPage = res.currentPage;
+	},
+});
+
+function handleReaderPageChange(page: number, totalPages: number) {
+	currentMemberPage = page;
+	progressSynchronizer.syncPage(page, totalPages);
+}
+
+onDestroy(() => {
+	progressSynchronizer.cancel();
 });
 </script>
 
@@ -175,7 +200,7 @@ let userProgress = $derived.by(() => {
 
 				<section class="race-section" aria-label="Reading race progress">
 					<RaceTrack
-						members={data.members}
+						members={members}
 						totalPages={data.activeCycle.book.pageCount || 1}
 					/>
 				</section>
@@ -266,6 +291,7 @@ let userProgress = $derived.by(() => {
 		initialPage={userProgress?.page || 1}
 		totalPages={data.activeCycle.book.pageCount || 1}
 		onclose={() => (isPdfReaderOpen = false)}
+		onpagechange={handleReaderPageChange}
 	/>
 {/if}
 
