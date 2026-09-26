@@ -19,3 +19,5 @@ export type AdvancedCriteriaKey = (typeof ADVANCED_CRITERIA_KEYS)[number];
 
 export const CRITERIA_MIN_SCORE = 1;
 export const CRITERIA_MAX_SCORE = 5;
+
+export const REVIEW_COMMENT_MAX_LENGTH = 1000;
