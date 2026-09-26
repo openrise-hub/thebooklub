@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+	DEFAULT_SEARCH_RESULTS_LIMIT,
+	GOOGLE_BOOKS_API_URL,
+	MAX_SEARCH_RESULTS_LIMIT,
+	MIN_SEARCH_QUERY_LENGTH,
+	OPEN_LIBRARY_SEARCH_URL,
+} from "./books";
+import {
 	CADENCE_TYPES,
 	PROGRESS_DEBOUNCE_MS,
 	PURGE_DELAY_HOURS,
@@ -111,5 +118,13 @@ describe("Application Routes", () => {
 		expect(ROUTES.API_CLUB_JOIN).toBe("/api/club/join");
 		expect(ROUTES.API_CLUB_PDF("abc")).toBe("/api/club/abc/pdf");
 		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
+	});
+describe("Book Discovery Constants", () => {
+	it("defines query bounds and endpoints", () => {
+		expect(MIN_SEARCH_QUERY_LENGTH).toBe(2);
+		expect(DEFAULT_SEARCH_RESULTS_LIMIT).toBe(10);
+		expect(MAX_SEARCH_RESULTS_LIMIT).toBe(20);
+		expect(GOOGLE_BOOKS_API_URL).toContain("googleapis.com");
+		expect(OPEN_LIBRARY_SEARCH_URL).toContain("openlibrary.org");
 	});
 });
