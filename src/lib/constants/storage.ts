@@ -13,3 +13,8 @@ export const PRESIGNED_UPLOAD_EXPIRY_SECONDS = 900; // 15 minutes
 export const PRESIGNED_READ_EXPIRY_SECONDS = 3600; // 1 hour
 
 export const R2_DEFAULT_REGION = "auto";
+
+export const ZOOM_MIN = 0.5;
+export const ZOOM_MAX = 3.0;
+export const ZOOM_STEP = 0.25;
+export const DEFAULT_ZOOM = 1.0;
