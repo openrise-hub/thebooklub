@@ -9,6 +9,12 @@ export interface ServerEnv {
 	KINDE_SITE_URL?: string;
 	DATABASE_URL?: string;
 	DATABASE_AUTH_TOKEN?: string;
+	R2_ACCOUNT_ID?: string;
+	R2_ACCESS_KEY_ID?: string;
+	R2_SECRET_ACCESS_KEY?: string;
+	R2_BUCKET_NAME?: string;
+	R2_ENDPOINT?: string;
+	R2_PUBLIC_URL?: string;
 }
 
 export function validateEnv(env: Record<string, string | undefined>): ServerEnv {
@@ -26,5 +32,11 @@ export function validateEnv(env: Record<string, string | undefined>): ServerEnv 
 		KINDE_SITE_URL: env.KINDE_SITE_URL,
 		DATABASE_URL: env.DATABASE_URL,
 		DATABASE_AUTH_TOKEN: env.DATABASE_AUTH_TOKEN,
+		R2_ACCOUNT_ID: env.R2_ACCOUNT_ID,
+		R2_ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID,
+		R2_SECRET_ACCESS_KEY: env.R2_SECRET_ACCESS_KEY,
+		R2_BUCKET_NAME: env.R2_BUCKET_NAME,
+		R2_ENDPOINT: env.R2_ENDPOINT,
+		R2_PUBLIC_URL: env.R2_PUBLIC_URL,
 	};
 }

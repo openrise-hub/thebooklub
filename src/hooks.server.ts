@@ -41,6 +41,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const token = extractSessionToken(event);
 	const user = token ? await verifySessionToken(token, serverEnv.AUTH_SECRET) : null;
 	event.locals.user = user;
+	event.locals.env = serverEnv;
 
 	const guardResponse = handleAccessGuard(event, user);
 	if (guardResponse) {

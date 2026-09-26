@@ -34,6 +34,13 @@ import {
 	STAR_STEP_INCREMENT,
 } from "./ratings";
 import { ROUTES } from "./routes";
+import {
+	ALLOWED_PDF_MIME_TYPES,
+	MAX_PDF_SIZE_MB,
+	PRESIGNED_READ_EXPIRY_SECONDS,
+	PRESIGNED_UPLOAD_EXPIRY_SECONDS,
+	MAX_PDF_SIZE_BYTES as STORAGE_MAX_PDF_SIZE_BYTES,
+} from "./storage";
 import { ACTION_COLOR_VARIANTS, DEFAULT_THEME, STORAGE_KEYS, THEMES } from "./ui";
 
 describe("Club Constants", () => {
@@ -130,5 +137,18 @@ describe("Book Discovery Constants", () => {
 		expect(MAX_SEARCH_RESULTS_LIMIT).toBe(20);
 		expect(GOOGLE_BOOKS_API_URL).toContain("googleapis.com");
 		expect(OPEN_LIBRARY_SEARCH_URL).toContain("openlibrary.org");
+	});
+});
+
+describe("Storage Constants", () => {
+	it("defines PDF file size limits and allowed MIME types", () => {
+		expect(MAX_PDF_SIZE_MB).toBe(25);
+		expect(MAX_PDF_SIZE_BYTES).toBe(25 * 1024 * 1024);
+		expect(ALLOWED_PDF_MIME_TYPES).toEqual(["application/pdf"]);
+	});
+
+	it("defines presigned URL expiration windows", () => {
+		expect(PRESIGNED_UPLOAD_EXPIRY_SECONDS).toBe(900);
+		expect(PRESIGNED_READ_EXPIRY_SECONDS).toBe(3600);
 	});
 });
