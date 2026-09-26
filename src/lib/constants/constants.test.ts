@@ -12,6 +12,7 @@ import {
 	CLUB_NAME_MIN_LENGTH,
 	DEFAULT_POLL_DURATION_HOURS,
 	INVITE_CODE_LENGTH,
+	INVITE_CODE_PATTERN,
 	MAX_CANDIDATE_BOOKS,
 	MAX_PDF_SIZE_BYTES,
 	MIN_CANDIDATE_BOOKS,
@@ -28,8 +29,10 @@ import { ROUTES } from "./routes";
 import { ACTION_COLOR_VARIANTS, DEFAULT_THEME, STORAGE_KEYS, THEMES } from "./ui";
 
 describe("Club Constants", () => {
-	it("enforces valid invite code length", () => {
+	it("enforces valid invite code length and pattern", () => {
 		expect(INVITE_CODE_LENGTH).toBe(8);
+		expect(INVITE_CODE_PATTERN.test("READ-4821")).toBe(true);
+		expect(INVITE_CODE_PATTERN.test("READ4821")).toBe(true);
 	});
 
 	it("enforces club name boundaries", () => {

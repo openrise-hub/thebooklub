@@ -15,6 +15,7 @@ let {
 	required = false,
 	maxlength,
 	autocomplete = "off",
+	oninput,
 }: {
 	value?: string;
 	label?: string;
@@ -28,6 +29,7 @@ let {
 	required?: boolean;
 	maxlength?: number;
 	autocomplete?: HTMLInputAttributes["autocomplete"];
+	oninput?: (event: Event) => void;
 } = $props();
 </script>
 
@@ -50,6 +52,7 @@ let {
 		{required}
 		{maxlength}
 		{autocomplete}
+		{oninput}
 		bind:value
 		class="chunky-input"
 		aria-invalid={!!error}

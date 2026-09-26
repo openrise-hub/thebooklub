@@ -1,126 +1,134 @@
 <script lang="ts">
+import { browser } from "$app/environment";
+import { goto } from "$app/navigation";
+import { page } from "$app/state";
+import { normalizeInviteCode, validateInviteCode } from "$lib/club/validation";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import Input from "$lib/components/Input.svelte";
-import Modal from "$lib/components/Modal.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
+import { ROUTES } from "$lib/constants/routes";
+import { STORAGE_KEYS } from "$lib/constants/ui";
 
-let sampleCode = $state("");
-let isModalOpen = $state(false);
+let clubCode = $state("");
 let errorMessage = $state("");
+let isSubmitting = $state(false);
 
-function handleValidate() {
-	if (sampleCode.trim().length === 0) {
-		errorMessage = "Please enter a code to continue";
-	} else {
-		errorMessage = "";
-		isModalOpen = true;
+$effect(() => {
+	const joinParam = page.url.searchParams.get("join");
+	if (joinParam && clubCode === "") {
+		clubCode = normalizeInviteCode(joinParam);
 	}
+});
+
+function handleCodeInput(event: Event) {
+	const target = event.target as HTMLInputElement;
+	clubCode = normalizeInviteCode(target.value);
+	if (errorMessage) {
+		errorMessage = "";
+	}
+}
+
+function handleJoinSubmit(event?: SubmitEvent) {
+	event?.preventDefault();
+
+	const result = validateInviteCode(clubCode);
+	if (!result.valid) {
+		errorMessage = result.error || "Invalid club code";
+		return;
+	}
+
+	errorMessage = "";
+	isSubmitting = true;
+
+	if (browser) {
+		sessionStorage.setItem(STORAGE_KEYS.PENDING_CLUB_CODE, result.normalized);
+	}
+
+	goto(ROUTES.CLUB_DASHBOARD(result.normalized));
 }
 </script>
 
 <svelte:head>
-	<title>The Book Club - Design System Showcase</title>
+	<title>The Book Club - Join Your Reading Group</title>
 </svelte:head>
 
-<header class="showcase-header">
-	<div class="header-content">
-		<div class="brand">
-			<span class="brand-badge">📚</span>
-			<h1 class="brand-title">The Book Club</h1>
+<div class="landing-page">
+	<header class="landing-header">
+		<div class="header-container">
+			<div class="brand">
+				<span class="brand-badge" aria-hidden="true">📚</span>
+				<span class="brand-title">The Book Club</span>
+			</div>
+			<ThemeSwitch />
 		</div>
-		<ThemeSwitch />
-	</div>
-</header>
+	</header>
 
-<main class="showcase-main">
-	<section class="hero-section">
-		<Card padding="lg">
-			<h2 class="section-title">Tactile Design Tokens & Components</h2>
-			<p class="section-description">
-				Solid geometric surfaces, 3px structural borders, and physical arcade push-down buttons.
-			</p>
-
-			<div class="demo-form">
-				<Input
-					label="Club Code"
-					placeholder="e.g. READ-4821"
-					maxlength={8}
-					bind:value={sampleCode}
-					error={errorMessage}
-				/>
-				<Button variant="purple" size="lg" onclick={handleValidate}>
-					Verify Code
-				</Button>
+	<main class="landing-main">
+		<div class="landing-hero-container">
+			<div class="hero-brand-block">
+				<div class="hero-icon" aria-hidden="true">📖</div>
+				<h1 class="hero-title">The Book Club</h1>
+				<p class="hero-tagline">
+					Private reading circles with zero-friction onboarding and arcade energy.
+				</p>
 			</div>
-		</Card>
-	</section>
 
-	<section class="components-grid">
-		<Card padding="md">
-			<h3 class="card-title">Universal Action Buttons</h3>
-			<p class="card-subtitle">5 solid base colors with physical depth shadows:</p>
+			<Card padding="lg" class="landing-card">
+				<form onsubmit={handleJoinSubmit} class="join-form">
+					<div class="form-header">
+						<h2 class="form-title">Enter Club Code</h2>
+						<p class="form-subtitle">Type your 8-character invite code to jump straight into your reading group.</p>
+					</div>
 
-			<div class="button-row">
-				<Button variant="purple">Purple (Brand)</Button>
-				<Button variant="red">Red</Button>
-				<Button variant="blue">Blue</Button>
-				<Button variant="yellow">Yellow</Button>
-				<Button variant="green">Green</Button>
-				<Button variant="neutral">Neutral</Button>
+					<Input
+						id="club-code-input"
+						label="Club Code"
+						placeholder="e.g. READ-4821"
+						maxlength={9}
+						bind:value={clubCode}
+						oninput={handleCodeInput}
+						error={errorMessage}
+						required
+					/>
+
+					<Button
+						type="submit"
+						variant="purple"
+						size="lg"
+						fullWidth
+						disabled={isSubmitting}
+					>
+						Join Club
+					</Button>
+				</form>
+			</Card>
+
+			<div class="secondary-actions">
+				<a href={ROUTES.CLUB_NEW} class="create-club-link">
+					Want to create your own club? Register here &rarr;
+				</a>
 			</div>
-		</Card>
-
-		<Card padding="md">
-			<h3 class="card-title">Button Sizes & States</h3>
-			<p class="card-subtitle">Scale and disabled handling:</p>
-
-			<div class="button-row">
-				<Button variant="blue" size="sm">Small</Button>
-				<Button variant="blue" size="md">Medium</Button>
-				<Button variant="blue" size="lg">Large</Button>
-				<Button variant="blue" disabled>Disabled</Button>
-			</div>
-		</Card>
-
-		<Card padding="md" elevated>
-			<h3 class="card-title">Elevated Card Surface</h3>
-			<p class="card-subtitle">Theme-aware elevated container surface with solid 3px border.</p>
-			<Button variant="green" fullWidth onclick={() => (isModalOpen = true)}>
-				Open Modal Dialog
-			</Button>
-		</Card>
-	</section>
-</main>
-
-<Modal
-	isOpen={isModalOpen}
-	title="Club Verified"
-	onclose={() => (isModalOpen = false)}
->
-	<p>You have verified code: <strong>{sampleCode || "DEMO-1234"}</strong></p>
-	<p style="margin-top: 12px; color: var(--text-muted);">
-		This dialog demonstrates solid modal containers with keyboard escape handling and click-outside dismissal.
-	</p>
-
-	{#snippet footer()}
-		<Button variant="neutral" size="sm" onclick={() => (isModalOpen = false)}>
-			Cancel
-		</Button>
-		<Button variant="purple" size="sm" onclick={() => (isModalOpen = false)}>
-			Confirm
-		</Button>
-	{/snippet}
-</Modal>
+		</div>
+	</main>
+</div>
 
 <style>
-	.showcase-header {
+	.landing-page {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--bg-primary);
+		color: var(--text-primary);
+	}
+
+	.landing-header {
 		background-color: var(--bg-surface);
 		border-bottom: var(--border-chunky);
 		padding: 16px 24px;
 	}
 
-	.header-content {
+	.header-container {
 		max-width: 1080px;
 		margin: 0 auto;
 		display: flex;
@@ -136,69 +144,141 @@ function handleValidate() {
 
 	.brand-badge {
 		font-size: 1.75rem;
+		line-height: 1;
 	}
 
 	.brand-title {
-		font-size: 1.5rem;
+		font-family: var(--font-sans);
+		font-size: 1.35rem;
 		font-weight: 900;
 		letter-spacing: -0.02em;
 		text-transform: uppercase;
 		color: var(--text-primary);
 	}
 
-	.showcase-main {
-		max-width: 1080px;
-		margin: 0 auto;
-		padding: 32px 20px;
+	.landing-main {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 40px 20px;
+	}
+
+	.landing-hero-container {
+		width: 100%;
+		max-width: 520px;
 		display: flex;
 		flex-direction: column;
-		gap: 28px;
+		align-items: center;
+		gap: 24px;
+	}
+
+	.hero-brand-block {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.hero-icon {
+		font-size: 3rem;
+		line-height: 1;
+		margin-bottom: 4px;
+	}
+
+	.hero-title {
+		font-family: var(--font-sans);
+		font-size: 2.5rem;
+		font-weight: 900;
+		text-transform: uppercase;
+		letter-spacing: -0.03em;
+		color: var(--text-primary);
+		line-height: 1.1;
+		margin: 0;
+	}
+
+	.hero-tagline {
+		font-family: var(--font-sans);
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: var(--text-muted);
+		margin: 0;
+		max-width: 440px;
+		line-height: 1.4;
+	}
+
+	:global(.landing-card) {
 		width: 100%;
 	}
 
-	.section-title {
-		font-size: 1.75rem;
-		font-weight: 900;
-		color: var(--text-primary);
-		margin-bottom: 8px;
-	}
-
-	.section-description {
-		font-size: 1.05rem;
-		color: var(--text-muted);
-		margin-bottom: 24px;
-	}
-
-	.demo-form {
+	.join-form {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
-		max-width: 480px;
+		gap: 24px;
 	}
 
-	.components-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-		gap: 20px;
-	}
-
-	.card-title {
-		font-size: 1.25rem;
-		font-weight: 800;
-		color: var(--text-primary);
-		margin-bottom: 6px;
-	}
-
-	.card-subtitle {
-		font-size: 0.95rem;
-		color: var(--text-muted);
-		margin-bottom: 16px;
-	}
-
-	.button-row {
+	.form-header {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		align-items: center;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.form-title {
+		font-family: var(--font-sans);
+		font-size: 1.5rem;
+		font-weight: 900;
+		text-transform: uppercase;
+		color: var(--text-primary);
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.form-subtitle {
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-muted);
+		margin: 0;
+		line-height: 1.4;
+	}
+
+	.secondary-actions {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.create-club-link {
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		font-weight: 800;
+		color: var(--brand-primary);
+		text-decoration: none;
+		padding: 10px 18px;
+		border-radius: var(--radius-md);
+		border: 2px solid transparent;
+		transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+	}
+
+	.create-club-link:hover {
+		background-color: var(--bg-surface);
+		border-color: var(--border-color);
+		transform: translateY(-2px);
+	}
+
+	.create-club-link:focus-visible {
+		outline: 3px solid var(--brand-primary);
+		outline-offset: 2px;
+	}
+
+	@media (max-width: 600px) {
+		.hero-title {
+			font-size: 2rem;
+		}
+
+		.landing-main {
+			padding: 24px 16px;
+		}
 	}
 </style>
