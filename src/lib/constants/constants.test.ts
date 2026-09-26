@@ -36,10 +36,14 @@ import {
 import { ROUTES } from "./routes";
 import {
 	ALLOWED_PDF_MIME_TYPES,
+	DEFAULT_ZOOM,
 	MAX_PDF_SIZE_MB,
 	PRESIGNED_READ_EXPIRY_SECONDS,
 	PRESIGNED_UPLOAD_EXPIRY_SECONDS,
 	MAX_PDF_SIZE_BYTES as STORAGE_MAX_PDF_SIZE_BYTES,
+	ZOOM_MAX,
+	ZOOM_MIN,
+	ZOOM_STEP,
 } from "./storage";
 import { ACTION_COLOR_VARIANTS, DEFAULT_THEME, STORAGE_KEYS, THEMES } from "./ui";
 
@@ -150,5 +154,12 @@ describe("Storage Constants", () => {
 	it("defines presigned URL expiration windows", () => {
 		expect(PRESIGNED_UPLOAD_EXPIRY_SECONDS).toBe(900);
 		expect(PRESIGNED_READ_EXPIRY_SECONDS).toBe(3600);
+	});
+
+	it("defines reader zoom thresholds and step increments", () => {
+		expect(DEFAULT_ZOOM).toBe(1.0);
+		expect(ZOOM_MIN).toBe(0.5);
+		expect(ZOOM_MAX).toBe(3.0);
+		expect(ZOOM_STEP).toBe(0.25);
 	});
 });
