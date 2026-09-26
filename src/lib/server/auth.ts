@@ -3,7 +3,10 @@ import {
 	PROTECTED_ROUTE_PREFIXES,
 	SESSION_MAX_AGE_SECONDS,
 } from "$lib/constants/auth";
+import { getGravatarUrl } from "$lib/utils/gravatar";
 import type { RequestEvent } from "@sveltejs/kit";
+
+export { getGravatarUrl };
 
 export type ClubMemberRole = "admin" | "member";
 
@@ -14,15 +17,6 @@ export interface UserSession {
 	isEmailVerified: boolean;
 	avatarUrl: string;
 	createdAt: number;
-}
-
-export async function getGravatarUrl(email: string): Promise<string> {
-	const normalized = email.trim().toLowerCase();
-	const msgUint8 = new TextEncoder().encode(normalized);
-	const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-	return `https://www.gravatar.com/avatar/${hashHex}?d=retro&s=120`;
 }
 
 export async function createSessionToken(session: UserSession, secret: string): Promise<string> {
