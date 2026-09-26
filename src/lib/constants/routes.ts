@@ -1,7 +1,3 @@
-/**
- * Centralized typed application route constants.
- */
-
 export const ROUTES = {
 	HOME: "/",
 	CLUB_NEW: "/club/new",
@@ -10,6 +6,7 @@ export const ROUTES = {
 	CLUB_SETTINGS: (id: string) => `/club/${id}/settings`,
 	CLUB_SELECT: (id: string) => `/club/${id}/select`,
 	API_BOOKS_SEARCH: "/api/books/search",
+	API_CLUB_JOIN: "/api/club/join",
 	API_CLUB_PDF: (id: string) => `/api/club/${id}/pdf`,
 	API_CLUB_PROGRESS: (id: string) => `/api/club/${id}/progress`,
 } as const;
