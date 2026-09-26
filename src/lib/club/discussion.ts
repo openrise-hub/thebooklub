@@ -91,3 +91,11 @@ export function formatMessageTimestamp(timestamp: number, now: number = Date.now
 		day: "numeric",
 	});
 }
+
+export function isSpoiler(pageReference: number, currentUserPage: number): boolean {
+	if (pageReference <= PAGE_REF_BOOK_WIDE || Number.isNaN(pageReference)) {
+		return false;
+	}
+	const safeUserPage = Number.isNaN(currentUserPage) || currentUserPage < 0 ? 0 : currentUserPage;
+	return pageReference > safeUserPage;
+}
