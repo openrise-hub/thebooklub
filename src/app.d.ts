@@ -5,6 +5,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			user: import("$lib/server/auth").UserSession | null;
+			env: import("$lib/server/env").ServerEnv;
 		}
 		interface PageData {
 			user?: import("$lib/server/auth").UserSession | null;
