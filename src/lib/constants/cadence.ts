@@ -6,3 +6,6 @@ export const ROULETTE_SPIN_DURATION_MS = 5000;
 
 export const CADENCE_TYPES = ["weekly", "monthly", "custom"] as const;
 export type CadenceType = (typeof CADENCE_TYPES)[number];
+
+export const CYCLE_STATUSES = ["active", "completed", "purged"] as const;
+export type CycleStatus = (typeof CYCLE_STATUSES)[number];
