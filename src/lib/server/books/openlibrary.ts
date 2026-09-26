@@ -50,7 +50,8 @@ export async function fetchOpenLibrary(
 			return {
 				id: cleanId,
 				title: doc.title || "Untitled",
-				authors: doc.author_name && doc.author_name.length > 0 ? doc.author_name : ["Unknown Author"],
+				authors:
+					doc.author_name && doc.author_name.length > 0 ? doc.author_name : ["Unknown Author"],
 				description: undefined,
 				pageCount,
 				requiresManualPages: pageCount === null,

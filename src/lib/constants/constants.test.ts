@@ -119,6 +119,8 @@ describe("Application Routes", () => {
 		expect(ROUTES.API_CLUB_PDF("abc")).toBe("/api/club/abc/pdf");
 		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
 	});
+});
+
 describe("Book Discovery Constants", () => {
 	it("defines query bounds and endpoints", () => {
 		expect(MIN_SEARCH_QUERY_LENGTH).toBe(2);

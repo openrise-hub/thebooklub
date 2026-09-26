@@ -46,7 +46,9 @@ describe("fetchGoogleBooks", () => {
 		expect(book.authors).toEqual(["Frank Herbert"]);
 		expect(book.pageCount).toBe(412);
 		expect(book.requiresManualPages).toBe(false);
-		expect(book.coverUrl).toBe("https://books.google.com/books/content?id=dune&printsec=frontcover");
+		expect(book.coverUrl).toBe(
+			"https://books.google.com/books/content?id=dune&printsec=frontcover",
+		);
 		expect(book.buyUrl).toBe("https://play.google.com/store/books/dune");
 		expect(book.isbn).toBe("9780441172719");
 		expect(book.sourceProvider).toBe("google_books");
@@ -70,7 +72,11 @@ describe("fetchGoogleBooks", () => {
 		};
 
 		const mockFetch = vi.fn().mockResolvedValue(mockResponse);
-		const results = await fetchGoogleBooks("Obscure", undefined, mockFetch as unknown as typeof fetch);
+		const results = await fetchGoogleBooks(
+			"Obscure",
+			undefined,
+			mockFetch as unknown as typeof fetch,
+		);
 
 		expect(results).toHaveLength(1);
 		expect(results[0].pageCount).toBeNull();
@@ -183,7 +189,11 @@ describe("searchBooks (Dual-Engine Fallback)", () => {
 			});
 		});
 
-		const response = await searchBooks("Foundation", undefined, mockFetch as unknown as typeof fetch);
+		const response = await searchBooks(
+			"Foundation",
+			undefined,
+			mockFetch as unknown as typeof fetch,
+		);
 
 		expect(response.sourceProvider).toBe("open_library");
 		expect(response.count).toBe(1);
