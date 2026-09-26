@@ -49,7 +49,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			description: "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides.",
 			pageCount: 412,
 			requiresManualPages: false,
-			coverUrl: "https://books.google.com/books/content?id=B1hSGwAACAAJ&printsec=frontcover&img=1&zoom=1",
+			coverUrl:
+				"https://books.google.com/books/content?id=B1hSGwAACAAJ&printsec=frontcover&img=1&zoom=1",
 			infoUrl: "https://books.google.com/books?id=B1hSGwAACAAJ",
 			buyUrl: "https://books.google.com/books?id=B1hSGwAACAAJ",
 			sourceProvider: "google_books",

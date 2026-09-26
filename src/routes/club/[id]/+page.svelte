@@ -9,7 +9,9 @@ import type { PageData } from "./$types";
 
 let { data }: { data: PageData } = $props();
 
-let activeTab = $state<"discussion" | "reviews" | "selection" | "history" | "settings">("discussion");
+let activeTab = $state<"discussion" | "reviews" | "selection" | "history" | "settings">(
+	"discussion",
+);
 
 const tabs = [
 	{ id: "discussion", label: "Discussion", icon: "💬" },
@@ -19,9 +21,7 @@ const tabs = [
 	{ id: "settings", label: "Settings", icon: "⚙️" },
 ] as const;
 
-let cycleEvaluation = $derived(
-	data.activeCycle ? evaluateCycleState(data.activeCycle) : null,
-);
+let cycleEvaluation = $derived(data.activeCycle ? evaluateCycleState(data.activeCycle) : null);
 
 let countdownString = $derived(
 	cycleEvaluation ? formatCountdown(cycleEvaluation) : "No active cycle",

@@ -48,11 +48,10 @@ function getMemberPercent(currentPage: number): number {
 			<div class="racers-layer">
 				{#each members as member (member.id)}
 					{@const percent = getMemberPercent(member.currentPage)}
-					<div
+					<button
+						type="button"
 						class="racer-node"
 						style="left: calc({percent}% - 18px);"
-						tabindex="0"
-						role="group"
 						aria-label="{member.username}: page {member.currentPage} of {totalPages} ({percent}%)"
 					>
 						<img
@@ -64,7 +63,7 @@ function getMemberPercent(currentPage: number): number {
 							<span class="tooltip-name">{member.username}</span>
 							<span class="tooltip-page">Page {member.currentPage} / {totalPages} ({percent}%)</span>
 						</div>
-					</div>
+					</button>
 				{/each}
 			</div>
 		</div>
@@ -169,6 +168,9 @@ function getMemberPercent(currentPage: number): number {
 		top: -6px;
 		width: 36px;
 		height: 36px;
+		background: none;
+		border: none;
+		padding: 0;
 		cursor: pointer;
 		outline: none;
 		z-index: 5;

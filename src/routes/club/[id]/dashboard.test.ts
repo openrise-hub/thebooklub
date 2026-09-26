@@ -3,10 +3,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { describe, expect, it } from "vitest";
 import { load } from "./+page.server";
 
-function createMockDashboardEvent(
-	clubId: string,
-	user: UserSession | null,
-): RequestEvent {
+function createMockDashboardEvent(clubId: string, user: UserSession | null): RequestEvent {
 	return {
 		params: { id: clubId },
 		locals: { user },
@@ -27,14 +24,16 @@ describe("Club Dashboard Server Load", () => {
 	it("throws 303 redirect when visitor is not authenticated", async () => {
 		const event = createMockDashboardEvent("READ-4821", null);
 
-		await expect(load(event as any)).rejects.toThrow();
+		await expect(load(event as unknown as Parameters<typeof load>[0])).rejects.toThrow();
 	});
 
 	it("loads club data, active cycle, and member progress when authenticated", async () => {
 		const event = createMockDashboardEvent("READ-4821", verifiedUser);
-		const data = await load(event as any);
+		const data = await load(event as unknown as Parameters<typeof load>[0]);
 
 		expect(data).toBeDefined();
+		if (!data) throw new Error("Expected data to be returned");
+
 		expect(data.club.id).toBe("READ-4821");
 		expect(data.club.inviteCode).toBe("READ-4821");
 		expect(data.activeCycle).toBeDefined();
