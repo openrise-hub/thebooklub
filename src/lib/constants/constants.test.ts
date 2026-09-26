@@ -25,6 +25,7 @@ import {
 	MAX_PDF_SIZE_BYTES,
 	MIN_CANDIDATE_BOOKS,
 } from "./club";
+import { MESSAGE_MAX_LENGTH, MESSAGE_MIN_LENGTH, PAGE_REF_BOOK_WIDE } from "./discussion";
 import {
 	ADVANCED_CRITERIA_KEYS,
 	CRITERIA_MAX_SCORE,
@@ -132,7 +133,16 @@ describe("Application Routes", () => {
 		expect(ROUTES.API_CLUB_PDF("abc")).toBe("/api/club/abc/pdf");
 		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
 		expect(ROUTES.API_CLUB_CADENCE("abc")).toBe("/api/club/abc/cadence");
+		expect(ROUTES.API_CLUB_DISCUSSIONS("abc")).toBe("/api/club/abc/discussions");
 		expect(ROUTES.API_CRON_PURGE).toBe("/api/cron/purge");
+	});
+});
+
+describe("Discussion Constants", () => {
+	it("enforces message length limits and book-wide page tag indicator", () => {
+		expect(MESSAGE_MIN_LENGTH).toBe(1);
+		expect(MESSAGE_MAX_LENGTH).toBe(2000);
+		expect(PAGE_REF_BOOK_WIDE).toBe(0);
 	});
 });
 
