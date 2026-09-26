@@ -54,7 +54,7 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(data.error).toBe("Club ID is required");
 		});
 
-		it("returns 200 with reviews and average rating for valid club", async () => {
+		it("returns 200 with reviews, average rating, and criteria averages for valid club", async () => {
 			const event = createMockReviewEvent("GET", reviewer, "READ-4821");
 			const response = await GET(event);
 			const data = await response.json();
@@ -63,6 +63,12 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(data.success).toBe(true);
 			expect(Array.isArray(data.reviews)).toBe(true);
 			expect(data.averageRating).toBeGreaterThanOrEqual(0);
+			expect(data.criteriaAverages).toBeDefined();
+			expect(data.criteriaAverages.plot).toBe(4.5);
+			expect(data.criteriaAverages.characters).toBe(4.0);
+			expect(data.criteriaAverages.pacing).toBe(4.5);
+			expect(data.criteriaAverages.writing).toBe(4.5);
+			expect(data.criteriaAverages.emotion).toBe(3.5);
 		});
 	});
 
@@ -105,11 +111,38 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(data.error).toContain("increments of 0.5");
 		});
 
-		it("returns 200 and saves review on valid submission", async () => {
+		it("returns 400 Bad Request if criteria score is invalid", async () => {
+			const event = createMockReviewEvent("POST", reviewer, "READ-4821", {
+				rating: 4.0,
+				cycleId: "cycle-1",
+				criteria: {
+					plot: 6,
+					characters: 4,
+					pacing: 3,
+					writing: 4,
+					emotion: 5,
+				},
+			});
+			const response = await POST(event);
+			const data = await response.json();
+
+			expect(response.status).toBe(400);
+			expect(data.success).toBe(false);
+			expect(data.error).toContain("Score for plot must be an integer between 1 and 5");
+		});
+
+		it("returns 200 and saves review with criteria on valid submission", async () => {
 			const event = createMockReviewEvent("POST", reviewer, "READ-4821", {
 				rating: 4.5,
 				comment: "Masterclass in speculative fiction!",
 				cycleId: "cycle-1",
+				criteria: {
+					plot: 5,
+					characters: 4,
+					pacing: 4,
+					writing: 5,
+					emotion: 4,
+				},
 			});
 			const response = await POST(event);
 			const data = await response.json();
@@ -119,6 +152,13 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(data.review.rating).toBe(4.5);
 			expect(data.review.comment).toBe("Masterclass in speculative fiction!");
 			expect(data.review.username).toBe("StarCritic");
+			expect(data.review.criteria).toEqual({
+				plot: 5,
+				characters: 4,
+				pacing: 4,
+				writing: 5,
+				emotion: 4,
+			});
 		});
 
 		it("upserts review when user updates their existing review", async () => {
@@ -126,6 +166,13 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 				rating: 5.0,
 				comment: "Updated: definitely a 5-star masterpiece!",
 				cycleId: "cycle-1",
+				criteria: {
+					plot: 5,
+					characters: 5,
+					pacing: 5,
+					writing: 5,
+					emotion: 5,
+				},
 			});
 			const response = await POST(event);
 			const data = await response.json();
@@ -134,6 +181,7 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(data.success).toBe(true);
 			expect(data.review.rating).toBe(5.0);
 			expect(data.review.comment).toContain("Updated:");
+			expect(data.review.criteria?.plot).toBe(5);
 		});
 	});
 });
