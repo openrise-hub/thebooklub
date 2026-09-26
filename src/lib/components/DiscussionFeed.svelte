@@ -10,6 +10,7 @@ import type { UserSession } from "$lib/server/auth";
 import type { DiscussionMessage, DiscussionPostResponse } from "$lib/types/discussion";
 import Button from "./Button.svelte";
 import Card from "./Card.svelte";
+import SpoilerText from "./SpoilerText.svelte";
 
 interface Props {
 	clubId: string;
@@ -243,7 +244,11 @@ async function handleSubmit(event: SubmitEvent) {
 								</div>
 
 								<div class="message-text-content">
-									<p class="message-paragraph">{message.content}</p>
+									<SpoilerText
+										content={message.content}
+										pageReference={message.pageReference}
+										currentUserPage={currentReadingPage}
+									/>
 								</div>
 							</div>
 						</div>
@@ -502,12 +507,6 @@ async function handleSubmit(event: SubmitEvent) {
 		color: var(--text-primary);
 		font-size: 0.95rem;
 		line-height: 1.5;
-	}
-
-	.message-paragraph {
-		margin: 0;
-		white-space: pre-wrap;
-		word-break: break-word;
 	}
 
 	.empty-state {
