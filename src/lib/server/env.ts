@@ -15,6 +15,7 @@ export interface ServerEnv {
 	R2_BUCKET_NAME?: string;
 	R2_ENDPOINT?: string;
 	R2_PUBLIC_URL?: string;
+	CRON_SECRET?: string;
 }
 
 export function validateEnv(env: Record<string, string | undefined>): ServerEnv {
@@ -38,5 +39,6 @@ export function validateEnv(env: Record<string, string | undefined>): ServerEnv 
 		R2_BUCKET_NAME: env.R2_BUCKET_NAME,
 		R2_ENDPOINT: env.R2_ENDPOINT,
 		R2_PUBLIC_URL: env.R2_PUBLIC_URL,
+		CRON_SECRET: env.CRON_SECRET,
 	};
 }
