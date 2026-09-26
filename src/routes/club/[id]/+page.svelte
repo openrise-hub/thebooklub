@@ -2,12 +2,15 @@
 import { evaluateCycleState, formatCountdown } from "$lib/cadence/engine";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
+import PDFViewer from "$lib/components/PDFViewer.svelte";
 import RaceTrack from "$lib/components/RaceTrack.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { ROUTES } from "$lib/constants/routes";
 import type { PageData } from "./$types";
 
 let { data }: { data: PageData } = $props();
+
+let isPdfReaderOpen = $state(false);
 
 let activeTab = $state<"discussion" | "reviews" | "selection" | "history" | "settings">(
 	"discussion",
@@ -139,7 +142,11 @@ let userProgress = $derived.by(() => {
 
 								<div class="hero-actions">
 									{#if data.activeCycle.pdfKey}
-										<Button variant="purple" size="md">
+										<Button
+											variant="purple"
+											size="md"
+											onclick={() => (isPdfReaderOpen = true)}
+										>
 											Read Online (PDF)
 										</Button>
 									{:else}
@@ -248,6 +255,19 @@ let userProgress = $derived.by(() => {
 		</div>
 	</main>
 </div>
+
+{#if isPdfReaderOpen && data.activeCycle}
+	<PDFViewer
+		isOpen={isPdfReaderOpen}
+		clubId={data.club.id}
+		bookTitle={data.activeCycle.book.title}
+		bookAuthor={data.activeCycle.book.authors.join(", ")}
+		pdfUrl={`/api/club/${data.club.id}/pdf?fileKey=${encodeURIComponent(data.activeCycle.pdfKey || "")}`}
+		initialPage={userProgress?.page || 1}
+		totalPages={data.activeCycle.book.pageCount || 1}
+		onclose={() => (isPdfReaderOpen = false)}
+	/>
+{/if}
 
 <style>
 	.dashboard-page {
