@@ -2,6 +2,7 @@
 import { evaluateCycleState, formatCountdown } from "$lib/cadence/engine";
 import { calculateProgressPercent, createProgressSynchronizer } from "$lib/club/progress";
 import { calculateAverageRating, calculateCriteriaAverages, formatRating } from "$lib/club/review";
+import Avatar from "$lib/components/Avatar.svelte";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import DiscussionFeed from "$lib/components/DiscussionFeed.svelte";
@@ -165,10 +166,10 @@ onDestroy(() => {
 			<div class="header-right">
 				{#if data.members.length > 0}
 					<div class="user-pill">
-						<img
+						<Avatar
 							src={data.members[0].avatarUrl}
-							alt={data.members[0].username}
-							class="user-avatar"
+							username={data.members[0].username}
+							size="sm"
 						/>
 						<span class="user-name">{data.members[0].username}</span>
 					</div>
@@ -373,10 +374,10 @@ onDestroy(() => {
 													<div class="review-item-card">
 														<div class="review-item-header">
 															<div class="reviewer-profile">
-																<img
+																<Avatar
 																	src={rev.avatarUrl}
-																	alt={rev.username}
-																	class="reviewer-avatar"
+																	username={rev.username}
+																	size="sm"
 																/>
 																<div class="reviewer-info">
 																	<span class="reviewer-username">{rev.username}</span>
@@ -590,14 +591,6 @@ onDestroy(() => {
 		border: 2px solid var(--border-color);
 		padding: 4px 10px 4px 4px;
 		border-radius: 999px;
-	}
-
-	.user-avatar {
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		object-fit: cover;
-		border: 1.5px solid var(--border-color);
 	}
 
 	.user-name {
@@ -951,14 +944,6 @@ onDestroy(() => {
 		display: flex;
 		align-items: center;
 		gap: 10px;
-	}
-
-	.reviewer-avatar {
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		border: 2px solid var(--border-color);
-		background-color: var(--bg-primary);
 	}
 
 	.reviewer-info {

@@ -1,4 +1,6 @@
 <script lang="ts">
+import Avatar from "./Avatar.svelte";
+
 interface RaceMember {
 	id: string;
 	username: string;
@@ -56,10 +58,10 @@ function getMemberPercent(currentPage: number): number {
 						style="left: calc({percent}% - 18px);"
 						aria-label="{member.username}: page {member.currentPage} of {totalPages} ({percent}%)"
 					>
-						<img
+						<Avatar
 							src={member.avatarUrl}
-							alt={member.username}
-							class="racer-avatar"
+							username={member.username}
+							size="sm"
 						/>
 						<div class="racer-tooltip">
 							<span class="tooltip-name">{member.username}</span>
@@ -183,17 +185,6 @@ function getMemberPercent(currentPage: number): number {
 	.racer-node:focus-visible {
 		transform: scale(1.2) translateY(-4px);
 		z-index: 20;
-	}
-
-	.racer-avatar {
-		width: 100%;
-		height: 100%;
-		border-radius: 50%;
-		border: 2.5px solid var(--border-color);
-		background-color: var(--bg-surface);
-		object-fit: cover;
-		box-shadow: 0 3px 0 var(--border-color);
-		display: block;
 	}
 
 	.racer-tooltip {

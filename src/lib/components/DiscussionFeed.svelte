@@ -8,6 +8,7 @@ import { MESSAGE_MAX_LENGTH, PAGE_REF_BOOK_WIDE } from "$lib/constants/discussio
 import { ROUTES } from "$lib/constants/routes";
 import type { UserSession } from "$lib/server/auth";
 import type { DiscussionMessage, DiscussionPostResponse } from "$lib/types/discussion";
+import Avatar from "./Avatar.svelte";
 import Button from "./Button.svelte";
 import Card from "./Card.svelte";
 import SpoilerText from "./SpoilerText.svelte";
@@ -220,10 +221,10 @@ async function handleSubmit(event: SubmitEvent) {
 					<Card padding="md" class="message-card">
 						<div class="message-layout">
 							<div class="message-avatar-container">
-								<img
+								<Avatar
 									src={message.avatarUrl}
-									alt={message.username}
-									class="message-avatar"
+									username={message.username}
+									size="md"
 								/>
 							</div>
 
@@ -441,15 +442,6 @@ async function handleSubmit(event: SubmitEvent) {
 		align-items: flex-start;
 	}
 
-	.message-avatar {
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		border: var(--border-chunky);
-		object-fit: cover;
-		background-color: var(--bg-surface);
-	}
-
 	.message-body {
 		flex: 1;
 		display: flex;
@@ -550,11 +542,6 @@ async function handleSubmit(event: SubmitEvent) {
 
 		.message-layout {
 			gap: 10px;
-		}
-
-		.message-avatar {
-			width: 36px;
-			height: 36px;
 		}
 	}
 </style>
