@@ -18,7 +18,7 @@ const checkpoints = [
 	{ label: "25%", percent: 25 },
 	{ label: "50%", percent: 50 },
 	{ label: "75%", percent: 75 },
-	{ label: "Finish 🏁", percent: 100 },
+	{ label: "Finish", percent: 100 },
 ];
 
 function getMemberPercent(currentPage: number): number {
@@ -31,7 +31,9 @@ function getMemberPercent(currentPage: number): number {
 <div class="race-track-wrapper">
 	<div class="race-header">
 		<div class="race-title-group">
-			<span class="race-icon" aria-hidden="true">🏎️</span>
+			<span class="race-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
+			</span>
 			<h3 class="race-title">Social Reading Race</h3>
 		</div>
 		<span class="race-stats">{members.length} {members.length === 1 ? "Reader" : "Readers"} on the track</span>

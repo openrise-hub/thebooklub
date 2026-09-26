@@ -38,10 +38,10 @@ function setTheme(theme: Theme) {
 	}
 }
 
-const themeLabels: Record<Theme, { label: string; icon: string }> = {
-	classic: { label: "Classic", icon: "☀️" },
-	midnight: { label: "Midnight", icon: "🌙" },
-	bookshelf: { label: "Bookshelf", icon: "📖" },
+const themeLabels: Record<Theme, { label: string }> = {
+	classic: { label: "Classic" },
+	midnight: { label: "Midnight" },
+	bookshelf: { label: "Bookshelf" },
 };
 </script>
 
@@ -52,8 +52,7 @@ const themeLabels: Record<Theme, { label: string; icon: string }> = {
 		onclick={cycleTheme}
 		ariaLabel="Switch color theme"
 	>
-		<span class="theme-icon" aria-hidden="true">{themeLabels[currentTheme].icon}</span>
-		<span class="theme-name">{themeLabels[currentTheme].label}</span>
+		<span class="theme-name">{themeLabels[currentTheme].label} Theme</span>
 	</Button>
 </div>
 
@@ -61,11 +60,6 @@ const themeLabels: Record<Theme, { label: string; icon: string }> = {
 	.theme-switch-container {
 		display: inline-flex;
 		align-items: center;
-	}
-
-	.theme-icon {
-		margin-right: 6px;
-		font-size: 1rem;
 	}
 
 	.theme-name {

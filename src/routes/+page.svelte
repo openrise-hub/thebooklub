@@ -91,7 +91,9 @@ async function handleAuthSuccess() {
 	<header class="landing-header">
 		<div class="header-container">
 			<div class="brand">
-				<span class="brand-badge" aria-hidden="true">📚</span>
+				<span class="brand-badge" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+				</span>
 				<span class="brand-title">The Book Club</span>
 			</div>
 			<div class="header-actions">
@@ -124,7 +126,9 @@ async function handleAuthSuccess() {
 	<main class="landing-main">
 		<div class="landing-hero-container">
 			<div class="hero-brand-block">
-				<div class="hero-icon" aria-hidden="true">📖</div>
+				<div class="hero-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+				</div>
 				<h1 class="hero-title">The Book Club</h1>
 				<p class="hero-tagline">
 					Private reading circles with zero-friction onboarding and arcade energy.
