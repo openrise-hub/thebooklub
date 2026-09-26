@@ -5,7 +5,7 @@ import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import Input from "$lib/components/Input.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
-import { type CadenceType, CADENCE_TYPES } from "$lib/constants/cadence";
+import { CADENCE_TYPES, type CadenceType } from "$lib/constants/cadence";
 import { CLUB_NAME_MAX_LENGTH, CLUB_NAME_MIN_LENGTH } from "$lib/constants/club";
 import { ROUTES } from "$lib/constants/routes";
 

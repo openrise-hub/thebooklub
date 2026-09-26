@@ -3,10 +3,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { describe, expect, it } from "vitest";
 import { POST } from "./+server";
 
-function createMockEvent(
-	user: UserSession | null,
-	body: Record<string, unknown>,
-): RequestEvent {
+function createMockEvent(user: UserSession | null, body: Record<string, unknown>): RequestEvent {
 	const request = new Request("http://localhost/api/club/create", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },

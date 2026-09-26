@@ -1,5 +1,5 @@
 import { generateInviteCode } from "$lib/club/generator";
-import { type CadenceType, CADENCE_TYPES } from "$lib/constants/cadence";
+import { CADENCE_TYPES, type CadenceType } from "$lib/constants/cadence";
 import { CLUB_NAME_MAX_LENGTH, CLUB_NAME_MIN_LENGTH } from "$lib/constants/club";
 import { ROUTES } from "$lib/constants/routes";
 import { type RequestHandler, json } from "@sveltejs/kit";
