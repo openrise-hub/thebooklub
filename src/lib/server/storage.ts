@@ -286,3 +286,31 @@ export async function generatePresignedDownload(
 		expiresIn,
 	};
 }
+
+export async function deletePdfObject(
+	env: ServerEnv,
+	fileKey: string,
+	customFetch: typeof fetch = fetch,
+): Promise<boolean> {
+	if (!fileKey) return false;
+	const config = getR2Config(env);
+
+	if (!config) {
+		return true;
+	}
+
+	try {
+		const deleteUrl = await generateAwsV4PresignedUrl({
+			method: "DELETE",
+			bucket: config.bucketName,
+			key: fileKey,
+			config,
+			expiresInSeconds: 60,
+		});
+
+		const response = await customFetch(deleteUrl, { method: "DELETE" });
+		return response.ok || response.status === 204 || response.status === 404;
+	} catch {
+		return false;
+	}
+}

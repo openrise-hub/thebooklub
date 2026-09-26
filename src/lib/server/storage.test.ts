@@ -8,6 +8,7 @@ import type { ServerEnv } from "./env";
 import {
 	type R2Config,
 	createPdfStorageKey,
+	deletePdfObject,
 	generateAwsV4PresignedUrl,
 	generatePresignedDownload,
 	generatePresignedUpload,
@@ -121,5 +122,15 @@ describe("Storage Fallback Modes", () => {
 
 		expect(result.downloadUrl).toContain("mock-r2.local/download");
 		expect(result.expiresIn).toBe(PRESIGNED_READ_EXPIRY_SECONDS);
+	});
+
+	it("returns true for deletePdfObject in mock fallback mode", async () => {
+		const result = await deletePdfObject(emptyEnv, "clubs/READ-4821/cycles/cy-1/doc.pdf");
+		expect(result).toBe(true);
+	});
+
+	it("returns false for deletePdfObject if fileKey is empty", async () => {
+		const result = await deletePdfObject(emptyEnv, "");
+		expect(result).toBe(false);
 	});
 });
