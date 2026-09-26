@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	formatMessageTimestamp,
 	formatPageReference,
+	isSpoiler,
 	validateDiscussionMessage,
 } from "./discussion";
 
@@ -80,5 +81,29 @@ describe("formatMessageTimestamp", () => {
 
 	it("formats days ago", () => {
 		expect(formatMessageTimestamp(baseNow - 4 * 24 * 60 * 60 * 1000, baseNow)).toBe("4d ago");
+	});
+});
+
+describe("isSpoiler (Anti-Spoiler Evaluation)", () => {
+	it("returns false for book-wide page reference (page 0)", () => {
+		expect(isSpoiler(0, 50)).toBe(false);
+		expect(isSpoiler(0, 0)).toBe(false);
+	});
+
+	it("returns false if message page is less than or equal to user reading page", () => {
+		expect(isSpoiler(30, 50)).toBe(false);
+		expect(isSpoiler(50, 50)).toBe(false);
+	});
+
+	it("returns true if message page is ahead of user reading page", () => {
+		expect(isSpoiler(51, 50)).toBe(true);
+		expect(isSpoiler(200, 42)).toBe(true);
+		expect(isSpoiler(10, 0)).toBe(true);
+	});
+
+	it("safely handles NaN and negative inputs", () => {
+		expect(isSpoiler(Number.NaN, 50)).toBe(false);
+		expect(isSpoiler(10, Number.NaN)).toBe(true);
+		expect(isSpoiler(10, -5)).toBe(true);
 	});
 });
