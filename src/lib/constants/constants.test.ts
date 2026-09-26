@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+	AVATAR_FALLBACK_MODES,
+	AVATAR_SIZE_MAP,
+	DEFAULT_AVATAR_FALLBACK,
+	DEFAULT_AVATAR_SIZE,
+} from "./avatars";
+import {
 	DEFAULT_SEARCH_RESULTS_LIMIT,
 	GOOGLE_BOOKS_API_URL,
 	MAX_SEARCH_RESULTS_LIMIT,
@@ -183,5 +189,27 @@ describe("Storage Constants", () => {
 		expect(ZOOM_MIN).toBe(0.5);
 		expect(ZOOM_MAX).toBe(3.0);
 		expect(ZOOM_STEP).toBe(0.25);
+	});
+});
+
+describe("Avatar Constants", () => {
+	it("defines supported avatar sizes and fallback modes", () => {
+		expect(AVATAR_SIZE_MAP.xs).toBe(24);
+		expect(AVATAR_SIZE_MAP.sm).toBe(32);
+		expect(AVATAR_SIZE_MAP.md).toBe(40);
+		expect(AVATAR_SIZE_MAP.lg).toBe(64);
+		expect(AVATAR_SIZE_MAP.xl).toBe(96);
+		expect(AVATAR_SIZE_MAP.xxl).toBe(120);
+
+		expect(AVATAR_FALLBACK_MODES).toEqual([
+			"retro",
+			"robohash",
+			"identicon",
+			"mp",
+			"wavatar",
+			"monsterid",
+		]);
+		expect(DEFAULT_AVATAR_FALLBACK).toBe("retro");
+		expect(DEFAULT_AVATAR_SIZE).toBe(120);
 	});
 });
