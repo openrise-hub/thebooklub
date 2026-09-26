@@ -223,8 +223,15 @@ let userProgress = $derived.by(() => {
 							<div class="panel-placeholder">
 								<h3 class="panel-heading">📚 Past Cycles Archive</h3>
 								<p class="panel-text">
-									Completed book cycles and archived reviews will appear here in Phase 3.5.
+									Browse past completed books, member reviews, rubrics, and discussion logs in read-only archive mode.
 								</p>
+								<div style="margin-top: 12px;">
+									<a href={ROUTES.CLUB_HISTORY(data.club.id)} style="text-decoration: none;">
+										<Button variant="purple" size="md">
+											Open Full History Archive &rarr;
+										</Button>
+									</a>
+								</div>
 							</div>
 						{:else if activeTab === "settings"}
 							<div class="panel-placeholder">
