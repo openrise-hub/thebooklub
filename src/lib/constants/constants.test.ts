@@ -107,6 +107,7 @@ describe("Application Routes", () => {
 		expect(ROUTES.CLUB_SETTINGS("abc")).toBe("/club/abc/settings");
 		expect(ROUTES.CLUB_SELECT("abc")).toBe("/club/abc/select");
 		expect(ROUTES.API_BOOKS_SEARCH).toBe("/api/books/search");
+		expect(ROUTES.API_CLUB_CREATE).toBe("/api/club/create");
 		expect(ROUTES.API_CLUB_JOIN).toBe("/api/club/join");
 		expect(ROUTES.API_CLUB_PDF("abc")).toBe("/api/club/abc/pdf");
 		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
