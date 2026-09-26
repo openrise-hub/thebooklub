@@ -1,13 +1,13 @@
 <script lang="ts">
 import { formatRating, validateReview } from "$lib/club/review";
 import {
+	ADVANCED_CRITERIA_KEYS,
+	type AdvancedCriteriaKey,
+	CRITERIA_METADATA,
 	REVIEW_COMMENT_MAX_LENGTH,
-	STAR_MAX_RATING,
-	STAR_MIN_RATING,
-	STAR_STEP_INCREMENT,
 } from "$lib/constants/ratings";
 import { ROUTES } from "$lib/constants/routes";
-import type { Review, ReviewPostResponse } from "$lib/types/review";
+import type { Review, ReviewCriteriaScores, ReviewPostResponse } from "$lib/types/review";
 import Button from "./Button.svelte";
 import Modal from "./Modal.svelte";
 
@@ -16,8 +16,10 @@ interface Props {
 	clubId: string;
 	cycleId: string;
 	bookTitle: string;
+	enableAdvancedCriteria?: boolean;
 	existingRating?: number;
 	existingComment?: string;
+	existingCriteria?: ReviewCriteriaScores;
 	onclose?: () => void;
 	onsubmit?: (review: Review) => void;
 }
@@ -27,14 +29,23 @@ const {
 	clubId,
 	cycleId,
 	bookTitle,
+	enableAdvancedCriteria = false,
 	existingRating = 4.0,
 	existingComment = "",
+	existingCriteria,
 	onclose,
 	onsubmit,
 }: Props = $props();
 
 let rating = $state(4.0);
 let comment = $state("");
+let criteria = $state<ReviewCriteriaScores>({
+	plot: 4,
+	characters: 4,
+	pacing: 4,
+	writing: 4,
+	emotion: 4,
+});
 let isSubmitting = $state(false);
 let errorMessage = $state<string | null>(null);
 
@@ -45,22 +56,37 @@ $effect(() => {
 	if (existingComment) {
 		comment = existingComment;
 	}
+	if (existingCriteria) {
+		criteria = {
+			plot: existingCriteria.plot ?? 4,
+			characters: existingCriteria.characters ?? 4,
+			pacing: existingCriteria.pacing ?? 4,
+			writing: existingCriteria.writing ?? 4,
+			emotion: existingCriteria.emotion ?? 4,
+		};
+	}
 });
 
 let charCount = $derived(comment.length);
 let isOverLimit = $derived(charCount > REVIEW_COMMENT_MAX_LENGTH);
 
 const starValues = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+const criteriaScoreSteps = [1, 2, 3, 4, 5];
 
 function handleSelectRating(val: number) {
 	rating = val;
+}
+
+function handleSetCriterion(key: AdvancedCriteriaKey, val: number) {
+	criteria[key] = val;
 }
 
 async function handleSubmitReview(event: SubmitEvent) {
 	event.preventDefault();
 	errorMessage = null;
 
-	const validation = validateReview(rating, comment);
+	const criteriaPayload = enableAdvancedCriteria ? criteria : undefined;
+	const validation = validateReview(rating, comment, criteriaPayload);
 	if (!validation.valid) {
 		errorMessage = validation.error ?? "Invalid review";
 		return;
@@ -76,6 +102,7 @@ async function handleSubmitReview(event: SubmitEvent) {
 				cycleId,
 				rating,
 				comment: comment.trim() || undefined,
+				criteria: criteriaPayload,
 			}),
 		});
 
@@ -104,7 +131,7 @@ async function handleSubmitReview(event: SubmitEvent) {
 			</div>
 
 			<div class="rating-picker-section">
-				<span class="rating-section-title">Your Star Rating</span>
+				<span class="rating-section-title">Overall Star Rating</span>
 				<div class="star-rating-row" role="radiogroup" aria-label="Book star rating">
 					{#each starValues as starVal}
 						<button
@@ -132,6 +159,49 @@ async function handleSubmitReview(event: SubmitEvent) {
 					<span class="rating-text">/ 5.0 Stars</span>
 				</div>
 			</div>
+
+			{#if enableAdvancedCriteria}
+				<div class="advanced-rubric-section">
+					<div class="rubric-header">
+						<span class="rating-section-title">Detailed Rubric Ratings</span>
+						<span class="rubric-hint">Score each dimension from 1 to 5</span>
+					</div>
+
+					<div class="criteria-grid">
+						{#each ADVANCED_CRITERIA_KEYS as key}
+							{@const meta = CRITERIA_METADATA[key]}
+							<div class="criterion-card" role="radiogroup" aria-label="{meta.label} rating">
+								<div class="criterion-top">
+									<div class="criterion-titles">
+										<span class="criterion-name">{meta.label}</span>
+										<span class="criterion-desc">{meta.description}</span>
+									</div>
+									<div class="criterion-score-indicator">
+										<span class="indicator-num">{criteria[key]}</span>
+										<span class="indicator-max">/ 5</span>
+									</div>
+								</div>
+
+								<div class="criterion-buttons">
+									{#each criteriaScoreSteps as stepVal}
+										<button
+											type="button"
+											role="radio"
+											aria-checked={criteria[key] === stepVal}
+											class="criterion-btn"
+											class:selected={criteria[key] === stepVal}
+											onclick={() => handleSetCriterion(key, stepVal)}
+											aria-label="{meta.label} {stepVal} of 5"
+										>
+											{stepVal}
+										</button>
+									{/each}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
 
 			<div class="comment-section">
 				<label for="review-comment-input" class="comment-label">
@@ -290,6 +360,125 @@ async function handleSubmitReview(event: SubmitEvent) {
 		font-size: 0.85rem;
 		font-weight: 700;
 		color: var(--text-secondary);
+	}
+
+	.advanced-rubric-section {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		padding-top: 6px;
+		border-top: 2px dashed var(--border-color);
+	}
+
+	.rubric-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.rubric-hint {
+		font-size: 0.8rem;
+		font-weight: 700;
+		color: var(--text-muted);
+	}
+
+	.criteria-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.criterion-card {
+		background-color: var(--bg-primary);
+		border: 2px solid var(--border-color);
+		border-radius: 6px;
+		padding: 10px 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.criterion-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.criterion-titles {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+	}
+
+	.criterion-name {
+		font-size: 0.85rem;
+		font-weight: 800;
+		color: var(--text-primary);
+	}
+
+	.criterion-desc {
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: var(--text-muted);
+		line-height: 1.2;
+	}
+
+	.criterion-score-indicator {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 2px;
+		background-color: var(--bg-surface);
+		border: 2px solid var(--border-color);
+		border-radius: 4px;
+		padding: 1px 6px;
+		flex-shrink: 0;
+	}
+
+	.indicator-num {
+		font-size: 0.9rem;
+		font-weight: 900;
+		color: var(--text-primary);
+	}
+
+	.indicator-max {
+		font-size: 0.7rem;
+		font-weight: 700;
+		color: var(--text-muted);
+	}
+
+	.criterion-buttons {
+		display: flex;
+		gap: 6px;
+	}
+
+	.criterion-btn {
+		flex: 1;
+		padding: 6px 0;
+		background-color: var(--bg-surface);
+		border: 2px solid var(--border-color);
+		border-radius: 4px;
+		font-size: 0.85rem;
+		font-weight: 800;
+		color: var(--text-secondary);
+		cursor: pointer;
+		text-align: center;
+		transition: all 0.1s ease;
+	}
+
+	.criterion-btn:hover {
+		background-color: var(--color-blue);
+		color: #ffffff;
+		border-color: var(--border-color);
+	}
+
+	.criterion-btn.selected {
+		background-color: var(--color-blue);
+		color: #ffffff;
+		box-shadow: 0 2px 0 var(--border-color);
+		border-color: var(--border-color);
 	}
 
 	.comment-section {
