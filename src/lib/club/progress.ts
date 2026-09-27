@@ -22,11 +22,84 @@ export interface ProgressSynchronizerOptions {
 	onError?: (error: Error) => void;
 }
 
+export interface RaceMember {
+	id: string;
+	username: string;
+	avatarUrl: string;
+	currentPage: number;
+}
+
+export interface RacerGroup {
+	page: number;
+	percent: number;
+	members: RaceMember[];
+}
+
 export function calculateProgressPercent(currentPage: number, totalPages: number): number {
 	if (totalPages <= 0 || Number.isNaN(totalPages)) return 0;
 	if (currentPage <= 0 || Number.isNaN(currentPage)) return 0;
 	const ratio = (currentPage / totalPages) * 100;
 	return Math.min(100, Math.max(0, Math.round(ratio)));
+}
+
+export function groupMembersByPosition(members: RaceMember[], totalPages: number): RacerGroup[] {
+	if (!members || members.length === 0) return [];
+
+	const groupsMap = new Map<number, RaceMember[]>();
+
+	for (const member of members) {
+		const rawPage =
+			typeof member.currentPage === "number" && !Number.isNaN(member.currentPage)
+				? Math.max(0, Math.min(member.currentPage, Math.max(1, totalPages)))
+				: 0;
+
+		const existing = groupsMap.get(rawPage);
+		if (existing) {
+			existing.push(member);
+		} else {
+			groupsMap.set(rawPage, [member]);
+		}
+	}
+
+	const groups: RacerGroup[] = [];
+	for (const [page, groupMembers] of groupsMap.entries()) {
+		groups.push({
+			page,
+			percent: calculateProgressPercent(page, totalPages),
+			members: groupMembers,
+		});
+	}
+
+	return groups.sort((a, b) => a.page - b.page);
+}
+
+export function formatRacerTooltip(
+	members: RaceMember[],
+	page: number,
+	totalPages: number,
+	percent: number,
+): { title: string; subtitle: string } {
+	if (!members || members.length === 0) {
+		return { title: "Reader", subtitle: "Page 0 / 1 (0%)" };
+	}
+
+	let subtitle = "";
+	if (page <= 0) {
+		subtitle = members.length > 1 ? `${members.length} Tied • Not started` : "Not started";
+	} else if (page >= totalPages && totalPages > 0) {
+		subtitle =
+			members.length > 1
+				? `${members.length} Tied • Finished (100%)`
+				: `Finished! (${page} / ${totalPages})`;
+	} else {
+		subtitle =
+			members.length > 1
+				? `${members.length} Tied • Page ${page} / ${totalPages} (${percent}%)`
+				: `Page ${page} / ${totalPages} (${percent}%)`;
+	}
+
+	const title = members.map((m) => m.username).join(", ");
+	return { title, subtitle };
 }
 
 export function createProgressSynchronizer(
