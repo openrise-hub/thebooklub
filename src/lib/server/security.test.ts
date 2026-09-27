@@ -1,6 +1,8 @@
 import type { UserSession } from "$lib/server/auth";
 import { createSessionToken, verifySessionToken } from "$lib/server/auth";
 import { validateEnv } from "$lib/server/env";
+import type { RequestEvent } from "@sveltejs/kit";
+import { describe, expect, it } from "vitest";
 import { POST as cadencePost } from "../../routes/api/club/[id]/cadence/+server";
 import {
 	GET as discussionsGet,
@@ -11,15 +13,10 @@ import {
 	GET as progressGet,
 	POST as progressPost,
 } from "../../routes/api/club/[id]/progress/+server";
-import {
-	GET as reviewsGet,
-	POST as reviewsPost,
-} from "../../routes/api/club/[id]/reviews/+server";
+import { GET as reviewsGet, POST as reviewsPost } from "../../routes/api/club/[id]/reviews/+server";
 import { POST as selectionPost } from "../../routes/api/club/[id]/selection/+server";
 import { POST as pollVotePost } from "../../routes/api/club/[id]/selection/poll/vote/+server";
 import { POST as selectionSpinPost } from "../../routes/api/club/[id]/selection/spin/+server";
-import type { RequestEvent } from "@sveltejs/kit";
-import { describe, expect, it } from "vitest";
 
 const mockAdminUser: UserSession = {
 	id: "user-admin-1",
