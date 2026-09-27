@@ -64,7 +64,7 @@ let {
 	{/if}
 
 	{#if error}
-		<div {id} class="error-badge" role="alert">
+		<div id={id ? `${id}-error` : undefined} class="error-badge" role="alert">
 			{error}
 		</div>
 	{/if}
@@ -94,6 +94,7 @@ let {
 
 	.chunky-input {
 		width: 100%;
+		min-height: 44px;
 		padding: 12px 16px;
 		font-family: var(--font-sans);
 		font-weight: 700;
@@ -111,9 +112,12 @@ let {
 		font-weight: 600;
 	}
 
-	.chunky-input:focus {
+	.chunky-input:focus,
+	.chunky-input:focus-visible {
 		border-color: var(--brand-primary);
 		box-shadow: 0 4px 0 var(--brand-shadow);
+		outline: 3px solid var(--border-color);
+		outline-offset: 2px;
 	}
 
 	.has-error .chunky-input {

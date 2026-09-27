@@ -84,7 +84,7 @@ function closeDiscussionsModal() {
 		</div>
 	</header>
 
-	<main class="history-main">
+	<main id="main-content" class="history-main" tabindex="-1">
 		<div class="history-content">
 			<div class="page-intro">
 				<div class="intro-text-group">

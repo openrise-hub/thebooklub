@@ -49,6 +49,8 @@ const {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		min-height: 44px;
+		min-width: 44px;
 		font-family: var(--font-sans);
 		font-weight: 800;
 		text-transform: uppercase;
@@ -66,6 +68,7 @@ const {
 	.size-sm {
 		padding: 8px 14px;
 		font-size: 0.85rem;
+		min-height: 44px;
 		border-radius: var(--radius-sm);
 		box-shadow: 0 4px 0 var(--btn-shadow);
 	}
@@ -146,8 +149,8 @@ const {
 	}
 
 	.chunky-button:focus-visible {
-		outline: 3px dashed var(--brand-primary);
-		outline-offset: 4px;
+		outline: 3px solid var(--border-color);
+		outline-offset: 3px;
 	}
 
 	/* Disabled State */

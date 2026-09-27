@@ -126,7 +126,7 @@ async function handleAuthSuccess() {
 		</div>
 	</header>
 
-	<main class="landing-main">
+	<main id="main-content" class="landing-main" tabindex="-1">
 		<div class="landing-hero-container">
 			<div class="hero-brand-block">
 				<div class="hero-icon" aria-hidden="true">
