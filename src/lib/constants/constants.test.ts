@@ -33,6 +33,14 @@ import {
 } from "./club";
 import { MESSAGE_MAX_LENGTH, MESSAGE_MIN_LENGTH, PAGE_REF_BOOK_WIDE } from "./discussion";
 import {
+	COPY_FEEDBACK_DURATION_MS,
+	QR_CODE_COLORS,
+	QR_CODE_DEFAULT_MARGIN,
+	QR_CODE_DEFAULT_WIDTH,
+	QR_CODE_ERROR_CORRECTION_LEVEL,
+	QR_CODE_HIGH_RES_WIDTH,
+} from "./qr";
+import {
 	ADVANCED_CRITERIA_KEYS,
 	CRITERIA_MAX_SCORE,
 	CRITERIA_METADATA,
@@ -241,3 +249,16 @@ describe("Social Constants", () => {
 		expect(SOCIAL_CARD_MIME_TYPE).toBe("image/png");
 	});
 });
+
+describe("QR Code Constants", () => {
+	it("defines error correction, dimensions, and styling tokens", () => {
+		expect(QR_CODE_ERROR_CORRECTION_LEVEL).toBe("M");
+		expect(QR_CODE_DEFAULT_MARGIN).toBe(2);
+		expect(QR_CODE_DEFAULT_WIDTH).toBe(256);
+		expect(QR_CODE_HIGH_RES_WIDTH).toBe(1024);
+		expect(QR_CODE_COLORS.dark).toBe("#1a1a1a");
+		expect(QR_CODE_COLORS.light).toBe("#ffffff");
+		expect(COPY_FEEDBACK_DURATION_MS).toBe(2000);
+	});
+});
+

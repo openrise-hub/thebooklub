@@ -19,6 +19,7 @@
 		"@sveltejs/adapter-auto": "7.0.1",
 		"@sveltejs/kit": "2.70.3",
 		"@sveltejs/vite-plugin-svelte": "7.3.1",
+		"@types/qrcode": "1.5.6",
 		"lefthook": "1.11.3",
 		"svelte": "5.57.1",
 		"svelte-check": "4.7.6",
@@ -28,6 +29,7 @@
 	},
 	"dependencies": {
 		"html-to-image": "1.11.13",
-		"pdfjs-dist": "4.10.38"
+		"pdfjs-dist": "4.10.38",
+		"qrcode": "1.5.4"
 	}
 }
