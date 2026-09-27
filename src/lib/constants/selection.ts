@@ -25,3 +25,9 @@ export const SELECTION_COLOR_PALETTE = [
 export const POLL_DURATION_PRESETS_HOURS = [1, 6, 12, 24, 48, 72] as const;
 export const DEFAULT_SELECTION_MODE: SelectionMode = "roulette";
 export const DEFAULT_POLL_HOURS = 24;
+
+export const ROULETTE_MIN_ROTATIONS = 5;
+export const ROULETTE_POINTER_ANGLE_DEG = 270;
+export const ROULETTE_EASING_CSS = "cubic-bezier(0.15, 0.9, 0.2, 1.0)";
+export { ROULETTE_SPIN_DURATION_MS } from "./cadence";
+

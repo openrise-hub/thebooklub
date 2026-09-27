@@ -54,6 +54,7 @@ import {
 import { ROUTES } from "./routes";
 import {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	DEFAULT_SOCIAL_CARD_FORMAT,
 	SOCIAL_CARD_DIMENSIONS,
 	SOCIAL_CARD_FORMATS,
@@ -65,12 +66,24 @@ import {
 	DEFAULT_POLL_HOURS,
 	DEFAULT_SELECTION_MODE,
 	POLL_DURATION_PRESETS_HOURS,
+=======
+	DEFAULT_POLL_HOURS,
+	DEFAULT_SELECTION_MODE,
+	POLL_DURATION_PRESETS_HOURS,
+	ROULETTE_EASING_CSS,
+	ROULETTE_MIN_ROTATIONS,
+	ROULETTE_POINTER_ANGLE_DEG,
+>>>>>>> e2a9988 (feat(selection): add roulette wheel geometry and math)
 	SELECTION_COLOR_PALETTE,
 	SELECTION_MODES,
 	SELECTION_STATUSES,
 	SELECTION_THEME_COLORS,
 } from "./selection";
+<<<<<<< HEAD
 >>>>>>> b974f1c (feat(selection): add selection helpers and constants)
+=======
+
+>>>>>>> e2a9988 (feat(selection): add roulette wheel geometry and math)
 import {
 	ALLOWED_PDF_MIME_TYPES,
 	DEFAULT_ZOOM,
@@ -242,6 +255,7 @@ describe("Avatar Constants", () => {
 	});
 });
 
+<<<<<<< HEAD
 describe("Social Constants", () => {
 	it("defines social card formats, dimensions, and limits", () => {
 		expect(SOCIAL_CARD_FORMATS).toEqual(["story", "post"]);
@@ -284,7 +298,7 @@ describe("Export Constants", () => {
 });
 
 describe("Selection Constants", () => {
-	it("defines selection modes, theme colors, and duration presets", () => {
+	it("defines selection modes, roulette math, theme colors, and duration presets", () => {
 		expect(SELECTION_MODES).toEqual(["roulette", "poll"]);
 		expect(SELECTION_STATUSES).toEqual(["draft", "active", "completed"]);
 		expect(SELECTION_THEME_COLORS).toEqual(["purple", "blue", "green", "yellow", "red"]);
@@ -292,6 +306,10 @@ describe("Selection Constants", () => {
 		expect(POLL_DURATION_PRESETS_HOURS).toEqual([1, 6, 12, 24, 48, 72]);
 		expect(DEFAULT_SELECTION_MODE).toBe("roulette");
 		expect(DEFAULT_POLL_HOURS).toBe(24);
+		expect(ROULETTE_MIN_ROTATIONS).toBe(5);
+		expect(ROULETTE_POINTER_ANGLE_DEG).toBe(270);
+		expect(ROULETTE_EASING_CSS).toBe("cubic-bezier(0.15, 0.9, 0.2, 1.0)");
+		expect(ROULETTE_SPIN_DURATION_MS).toBe(5000);
 	});
 });
 
