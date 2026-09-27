@@ -44,6 +44,14 @@ import {
 } from "./ratings";
 import { ROUTES } from "./routes";
 import {
+	DEFAULT_SOCIAL_CARD_FORMAT,
+	SOCIAL_CARD_DIMENSIONS,
+	SOCIAL_CARD_FORMATS,
+	SOCIAL_CARD_MAX_QUOTE_LENGTH,
+	SOCIAL_CARD_MIME_TYPE,
+	SOCIAL_CARD_PIXEL_RATIO,
+} from "./social";
+import {
 	ALLOWED_PDF_MIME_TYPES,
 	DEFAULT_ZOOM,
 	MAX_PDF_SIZE_MB,
@@ -211,5 +219,25 @@ describe("Avatar Constants", () => {
 		]);
 		expect(DEFAULT_AVATAR_FALLBACK).toBe("retro");
 		expect(DEFAULT_AVATAR_SIZE).toBe(120);
+	});
+});
+
+describe("Social Constants", () => {
+	it("defines social card formats, dimensions, and limits", () => {
+		expect(SOCIAL_CARD_FORMATS).toEqual(["story", "post"]);
+		expect(SOCIAL_CARD_DIMENSIONS.story).toEqual({
+			width: 1080,
+			height: 1920,
+			aspectRatio: "9/16",
+		});
+		expect(SOCIAL_CARD_DIMENSIONS.post).toEqual({
+			width: 1080,
+			height: 1080,
+			aspectRatio: "1/1",
+		});
+		expect(SOCIAL_CARD_PIXEL_RATIO).toBe(2);
+		expect(SOCIAL_CARD_MAX_QUOTE_LENGTH).toBe(280);
+		expect(DEFAULT_SOCIAL_CARD_FORMAT).toBe("post");
+		expect(SOCIAL_CARD_MIME_TYPE).toBe("image/png");
 	});
 });
