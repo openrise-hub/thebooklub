@@ -1,6 +1,11 @@
 import { PROGRESS_DEBOUNCE_MS } from "$lib/constants/cadence";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { calculateProgressPercent, createProgressSynchronizer } from "./progress";
+import {
+	calculateProgressPercent,
+	createProgressSynchronizer,
+	formatRacerTooltip,
+	groupMembersByPosition,
+} from "./progress";
 
 describe("calculateProgressPercent", () => {
 	it("calculates correct progress percentages", () => {
@@ -21,6 +26,88 @@ describe("calculateProgressPercent", () => {
 	it("safely handles NaN and non-finite numbers", () => {
 		expect(calculateProgressPercent(Number.NaN, 100)).toBe(0);
 		expect(calculateProgressPercent(50, Number.NaN)).toBe(0);
+	});
+});
+
+describe("groupMembersByPosition", () => {
+	const member1 = {
+		id: "m1",
+		username: "Alice",
+		avatarUrl: "https://gravatar.com/avatar/1",
+		currentPage: 100,
+	};
+	const member2 = {
+		id: "m2",
+		username: "Bob",
+		avatarUrl: "https://gravatar.com/avatar/2",
+		currentPage: 100,
+	};
+	const member3 = {
+		id: "m3",
+		username: "Charlie",
+		avatarUrl: "https://gravatar.com/avatar/3",
+		currentPage: 250,
+	};
+
+	it("groups tied members on the same page together", () => {
+		const groups = groupMembersByPosition([member1, member2, member3], 400);
+		expect(groups).toHaveLength(2);
+
+		expect(groups[0].page).toBe(100);
+		expect(groups[0].percent).toBe(25);
+		expect(groups[0].members).toHaveLength(2);
+		expect(groups[0].members.map((m) => m.username)).toEqual(["Alice", "Bob"]);
+
+		expect(groups[1].page).toBe(250);
+		expect(groups[1].percent).toBe(63);
+		expect(groups[1].members).toHaveLength(1);
+		expect(groups[1].members[0].username).toBe("Charlie");
+	});
+
+	it("returns empty array for empty member list", () => {
+		expect(groupMembersByPosition([], 300)).toEqual([]);
+	});
+
+	it("handles zero page and clamps overflowing pages", () => {
+		const unstarted = { id: "m4", username: "Dave", avatarUrl: "", currentPage: 0 };
+		const finished = { id: "m5", username: "Eve", avatarUrl: "", currentPage: 999 };
+
+		const groups = groupMembersByPosition([unstarted, finished], 300);
+		expect(groups[0].page).toBe(0);
+		expect(groups[0].percent).toBe(0);
+
+		expect(groups[1].page).toBe(300);
+		expect(groups[1].percent).toBe(100);
+	});
+});
+
+describe("formatRacerTooltip", () => {
+	const member1 = { id: "m1", username: "Alice", avatarUrl: "", currentPage: 50 };
+	const member2 = { id: "m2", username: "Bob", avatarUrl: "", currentPage: 50 };
+
+	it("formats tooltip for single member correctly", () => {
+		const tooltip = formatRacerTooltip([member1], 50, 200, 25);
+		expect(tooltip.title).toBe("Alice");
+		expect(tooltip.subtitle).toBe("Page 50 / 200 (25%)");
+	});
+
+	it("formats tooltip for tied members correctly", () => {
+		const tooltip = formatRacerTooltip([member1, member2], 50, 200, 25);
+		expect(tooltip.title).toBe("Alice, Bob");
+		expect(tooltip.subtitle).toBe("2 Tied • Page 50 / 200 (25%)");
+	});
+
+	it("formats tooltip for unstarted readers", () => {
+		const tooltip = formatRacerTooltip([member1], 0, 200, 0);
+		expect(tooltip.subtitle).toBe("Not started");
+
+		const tiedUnstarted = formatRacerTooltip([member1, member2], 0, 200, 0);
+		expect(tiedUnstarted.subtitle).toBe("2 Tied • Not started");
+	});
+
+	it("formats tooltip for finished readers", () => {
+		const tooltip = formatRacerTooltip([member1], 200, 200, 100);
+		expect(tooltip.subtitle).toContain("Finished!");
 	});
 });
 
