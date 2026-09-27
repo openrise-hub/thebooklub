@@ -6,6 +6,7 @@ export const ROUTES = {
 	CLUB_SETTINGS: (id: string) => `/club/${id}/settings`,
 	CLUB_SELECT: (id: string) => `/club/${id}/select`,
 	API_BOOKS_SEARCH: "/api/books/search",
+	API_AUTH: "/api/auth",
 	API_CLUB_CREATE: "/api/club/create",
 	API_CLUB_JOIN: "/api/club/join",
 	API_CLUB_PDF: (id: string) => `/api/club/${id}/pdf`,

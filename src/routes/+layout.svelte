@@ -1,5 +1,6 @@
 <script lang="ts">
 import "../app.css";
+import { t } from "$lib/i18n";
 import { localeState } from "$lib/i18n/state.svelte";
 import type { Snippet } from "svelte";
 import type { LayoutData } from "./$types";
@@ -17,6 +18,8 @@ $effect(() => {
 	}
 });
 </script>
+
+<a href="#main-content" class="skip-link">{t("nav_skip_to_content")}</a>
 
 <div class="app-container">
 	{#if children}

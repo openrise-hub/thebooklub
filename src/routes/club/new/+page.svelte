@@ -84,7 +84,7 @@ async function handleCreateClub(event: SubmitEvent) {
 		</div>
 	</header>
 
-	<main class="wizard-main">
+	<main id="main-content" class="wizard-main" tabindex="-1">
 		<div class="wizard-container">
 			<div class="wizard-title-block">
 				<h1 class="wizard-title">{t("wizard_title")}</h1>

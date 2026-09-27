@@ -5,16 +5,76 @@ import Button from "./Button.svelte";
 interface Props {
 	isOpen: boolean;
 	title?: string;
+	ariaLabel?: string;
+	id?: string;
 	onclose?: () => void;
 	children?: Snippet;
 	footer?: Snippet;
 }
 
-const { isOpen = false, title = "", onclose, children, footer }: Props = $props();
+const { isOpen = false, title = "", ariaLabel, id, onclose, children, footer }: Props = $props();
+
+let dialogElement = $state<HTMLDivElement | null>(null);
+const dialogId = $derived(id || "modal-dialog");
+const titleId = $derived(`${dialogId}-title`);
+
+$effect(() => {
+	if (isOpen && typeof document !== "undefined") {
+		document.body.classList.add("modal-open");
+
+		// Focus the dialog or the first interactive element
+		setTimeout(() => {
+			if (dialogElement) {
+				const focusable = dialogElement.querySelectorAll<HTMLElement>(
+					'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+				);
+				if (focusable.length > 0) {
+					focusable[0]?.focus();
+				} else {
+					dialogElement.focus();
+				}
+			}
+		}, 0);
+
+		return () => {
+			document.body.classList.remove("modal-open");
+		};
+	}
+});
 
 function handleKeydown(event: KeyboardEvent) {
 	if (event.key === "Escape" && isOpen && onclose) {
+		event.stopPropagation();
 		onclose();
+	}
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+	const selector =
+		'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+	return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+		(el) => el.offsetWidth > 0 || el.offsetHeight > 0,
+	);
+}
+
+function handleDialogKeydown(event: KeyboardEvent) {
+	if (event.key !== "Tab" || !dialogElement) return;
+
+	const focusable = getFocusableElements(dialogElement);
+	if (focusable.length === 0) return;
+
+	const first = focusable[0];
+	const last = focusable[focusable.length - 1];
+
+	if (
+		event.shiftKey &&
+		(document.activeElement === first || document.activeElement === dialogElement)
+	) {
+		event.preventDefault();
+		last.focus();
+	} else if (!event.shiftKey && document.activeElement === last) {
+		event.preventDefault();
+		first.focus();
 	}
 }
 
@@ -35,14 +95,18 @@ function handleBackdropClick(event: MouseEvent) {
 		onclick={handleBackdropClick}
 	>
 		<div
+			bind:this={dialogElement}
 			class="modal-dialog"
 			role="dialog"
 			aria-modal="true"
-			aria-label={title || "Dialog"}
+			aria-labelledby={title ? titleId : undefined}
+			aria-label={!title ? (ariaLabel || "Dialog") : undefined}
+			tabindex="-1"
+			onkeydown={handleDialogKeydown}
 		>
 			<div class="modal-header">
 				{#if title}
-					<h2 class="modal-title">{title}</h2>
+					<h2 id={titleId} class="modal-title">{title}</h2>
 				{/if}
 				{#if onclose}
 					<Button

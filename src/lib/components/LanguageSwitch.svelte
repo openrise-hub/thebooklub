@@ -65,7 +65,7 @@ function handleSelectLocale(locale: SupportedLocale) {
 		align-items: center;
 		justify-content: center;
 		min-width: 44px;
-		min-height: 38px;
+		min-height: 44px;
 		padding: 6px 12px;
 		background: transparent;
 		border: none;

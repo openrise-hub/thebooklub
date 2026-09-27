@@ -17,3 +17,11 @@ export const ACTION_COLOR_VARIANTS = ["red", "blue", "yellow", "green", "purple"
 export type ActionColorVariant = (typeof ACTION_COLOR_VARIANTS)[number];
 
 export const SPOILER_BLUR_RADIUS = "8px";
+
+/**
+ * WCAG 2.1 & Tactile Accessibility Standards
+ */
+export const MIN_TOUCH_TARGET_PX = 44;
+export const WCAG_AA_NORMAL_CONTRAST = 4.5;
+export const WCAG_AA_LARGE_CONTRAST = 3.0;
+export const WCAG_AAA_NORMAL_CONTRAST = 7.0;

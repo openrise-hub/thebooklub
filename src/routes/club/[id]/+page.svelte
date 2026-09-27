@@ -184,7 +184,7 @@ onDestroy(() => {
 		</div>
 	</header>
 
-	<main class="dashboard-main">
+	<main id="main-content" class="dashboard-main" tabindex="-1">
 		<div class="dashboard-content">
 			{#if data.activeCycle}
 				<section class="hero-section" aria-labelledby="active-book-title">
