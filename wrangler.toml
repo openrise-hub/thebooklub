@@ -1,0 +1,10 @@
+name = "the-book-club"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = ".svelte-kit/cloudflare"
+
+[[r2_buckets]]
+binding = "BOOK_PDF_STORAGE"
+bucket_name = "the-book-club-pdfs"
+
+[triggers]
+crons = ["0 * * * *"]
