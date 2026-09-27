@@ -1,5 +1,6 @@
 <script lang="ts">
 import { isSpoiler } from "$lib/club/discussion";
+import { t } from "$lib/i18n";
 
 interface Props {
 	content: string;
@@ -48,7 +49,7 @@ function handleKeyDown(event: KeyboardEvent) {
 			class="spoiler-overlay-button"
 			onclick={handleToggleReveal}
 			onkeydown={handleKeyDown}
-			aria-label="Spoiler alert: Page {pageReference}. You are on Page {currentUserPage}. Click to reveal content."
+			aria-label={t("discussions_spoiler_warning", { page: pageReference, userPage: currentUserPage })}
 		>
 			<span class="spoiler-icon" aria-hidden="true">
 				<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -56,19 +57,19 @@ function handleKeyDown(event: KeyboardEvent) {
 				</svg>
 			</span>
 			<span class="spoiler-text-prompt">
-				<strong>Spoiler Alert:</strong> Page {pageReference} (You are on Page {currentUserPage}). Click to reveal.
+				{t("discussions_spoiler_warning", { page: pageReference, userPage: currentUserPage })}
 			</span>
 		</button>
 	{:else if hasSpoiler && isManuallyRevealed}
 		<div class="spoiler-revealed-bar">
-			<span class="revealed-badge">Spoiler Revealed (Page {pageReference})</span>
+			<span class="revealed-badge">{t("discussions_page_tag", { page: pageReference })}</span>
 			<button
 				type="button"
 				class="hide-spoiler-btn"
 				onclick={handleToggleReveal}
-				aria-label="Hide spoiler again"
+				aria-label={t("common_close")}
 			>
-				Hide spoiler
+				{t("common_close")}
 			</button>
 		</div>
 	{/if}

@@ -6,6 +6,7 @@ import {
 } from "$lib/club/discussion";
 import { MESSAGE_MAX_LENGTH, PAGE_REF_BOOK_WIDE } from "$lib/constants/discussion";
 import { ROUTES } from "$lib/constants/routes";
+import { t } from "$lib/i18n";
 import type { UserSession } from "$lib/server/auth";
 import type { DiscussionMessage, DiscussionPostResponse } from "$lib/types/discussion";
 import Avatar from "./Avatar.svelte";
@@ -119,7 +120,7 @@ async function handleSubmit(event: SubmitEvent) {
 				</div>
 
 				<div class="page-tag-selector">
-					<label for="page-ref-input" class="page-tag-label">Page Tag:</label>
+					<label for="page-ref-input" class="page-tag-label">{t("discussions_page_reference")}:</label>
 					<input
 						type="number"
 						id="page-ref-input"
@@ -127,7 +128,7 @@ async function handleSubmit(event: SubmitEvent) {
 						max={totalPages}
 						bind:value={pageRefInput}
 						class="page-number-input"
-						aria-label="Page Reference"
+						aria-label={t("discussions_page_reference")}
 					/>
 					<div class="page-quick-buttons">
 						<button
@@ -135,9 +136,9 @@ async function handleSubmit(event: SubmitEvent) {
 							class="quick-page-btn"
 							class:active={pageRefInput === "0"}
 							onclick={() => setPageReference(PAGE_REF_BOOK_WIDE)}
-							aria-label="Set to Book-wide"
+							aria-label={t("discussions_book_wide")}
 						>
-							Book-wide
+							{t("discussions_book_wide")}
 						</button>
 						{#if currentReadingPage > 0}
 							<button
@@ -145,9 +146,9 @@ async function handleSubmit(event: SubmitEvent) {
 								class="quick-page-btn"
 								class:active={pageRefInput === String(currentReadingPage)}
 								onclick={() => setPageReference(currentReadingPage)}
-								aria-label="Set to current page {currentReadingPage}"
+								aria-label={t("discussions_page_tag", { page: currentReadingPage })}
 							>
-								Page {currentReadingPage}
+								{t("discussions_page_tag", { page: currentReadingPage })}
 							</button>
 						{/if}
 					</div>
@@ -157,12 +158,12 @@ async function handleSubmit(event: SubmitEvent) {
 			<div class="textarea-wrapper">
 				<textarea
 					bind:value={messageText}
-					placeholder="Share your insights, questions, or reactions to this milestone..."
+					placeholder={t("discussions_comment_placeholder")}
 					rows="3"
 					maxlength={MESSAGE_MAX_LENGTH + 50}
 					class="message-textarea"
 					class:over-limit={isOverLimit}
-					aria-label="Discussion message content"
+					aria-label={t("discussions_comment_placeholder")}
 				></textarea>
 
 				<div class="textarea-footer">
@@ -191,9 +192,9 @@ async function handleSubmit(event: SubmitEvent) {
 					disabled={isSubmitting || charCount === 0 || isOverLimit}
 				>
 					{#if isSubmitting}
-						Posting...
+						{t("discussions_posting")}
 					{:else}
-						Post Comment &rarr;
+						{t("discussions_post_button")} &rarr;
 					{/if}
 				</Button>
 			</div>
@@ -209,10 +210,7 @@ async function handleSubmit(event: SubmitEvent) {
 							<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM7 9h10v2H7zm0-3h10v2H7z"/>
 						</svg>
 					</span>
-					<h4 class="empty-title">No Discussion Messages Yet</h4>
-					<p class="empty-desc">
-						Be the first member to share a milestone thought, quote, or theory on this book!
-					</p>
+					<h4 class="empty-title">{t("discussions_empty")}</h4>
 				</div>
 			</Card>
 		{:else}
@@ -519,13 +517,6 @@ async function handleSubmit(event: SubmitEvent) {
 		font-size: 1.2rem;
 		font-weight: 800;
 		color: var(--text-primary);
-		margin: 0;
-	}
-
-	.empty-desc {
-		font-size: 0.95rem;
-		color: var(--text-secondary);
-		max-width: 440px;
 		margin: 0;
 	}
 

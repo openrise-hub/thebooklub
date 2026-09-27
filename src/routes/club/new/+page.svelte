@@ -9,6 +9,7 @@ import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { CADENCE_TYPES, type CadenceType } from "$lib/constants/cadence";
 import { CLUB_NAME_MAX_LENGTH, CLUB_NAME_MIN_LENGTH } from "$lib/constants/club";
 import { ROUTES } from "$lib/constants/routes";
+import { t } from "$lib/i18n";
 
 let clubName = $state("");
 let selectedCadence = $state<CadenceType>("weekly");
@@ -26,13 +27,11 @@ async function handleCreateClub(event: SubmitEvent) {
 	errorMessage = "";
 
 	const trimmedName = clubName.trim();
-	if (trimmedName.length < CLUB_NAME_MIN_LENGTH) {
-		errorMessage = `Club name must be at least ${CLUB_NAME_MIN_LENGTH} characters`;
-		return;
-	}
-
-	if (trimmedName.length > CLUB_NAME_MAX_LENGTH) {
-		errorMessage = `Club name cannot exceed ${CLUB_NAME_MAX_LENGTH} characters`;
+	if (trimmedName.length < CLUB_NAME_MIN_LENGTH || trimmedName.length > CLUB_NAME_MAX_LENGTH) {
+		errorMessage = t("wizard_error_name_length", {
+			min: CLUB_NAME_MIN_LENGTH,
+			max: CLUB_NAME_MAX_LENGTH,
+		});
 		return;
 	}
 
@@ -52,21 +51,21 @@ async function handleCreateClub(event: SubmitEvent) {
 		const data = await res.json();
 
 		if (!res.ok || !data.success) {
-			errorMessage = data.error || "Failed to create club. Please try again.";
+			errorMessage = data.error || t("common_error");
 			isSubmitting = false;
 			return;
 		}
 
 		goto(data.redirectUrl || ROUTES.CLUB_DASHBOARD(data.clubId));
 	} catch {
-		errorMessage = "Network error while creating club. Please check connection.";
+		errorMessage = t("common_error");
 		isSubmitting = false;
 	}
 }
 </script>
 
 <svelte:head>
-	<title>Create a Reading Club - The Book Club</title>
+	<title>{t("wizard_title")} - {t("app_name")}</title>
 </svelte:head>
 
 <div class="wizard-page">
@@ -76,7 +75,7 @@ async function handleCreateClub(event: SubmitEvent) {
 				<span class="brand-badge" aria-hidden="true">
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
 				</span>
-				<span class="brand-title">The Book Club</span>
+				<span class="brand-title">{t("app_name")}</span>
 			</a>
 			<div class="header-actions">
 				<LanguageSwitch />
@@ -88,9 +87,9 @@ async function handleCreateClub(event: SubmitEvent) {
 	<main class="wizard-main">
 		<div class="wizard-container">
 			<div class="wizard-title-block">
-				<h1 class="wizard-title">Create a Reading Club</h1>
+				<h1 class="wizard-title">{t("wizard_title")}</h1>
 				<p class="wizard-subtitle">
-					Set up your private group, customize cadence rules, and invite friends.
+					{t("wizard_subtitle")}
 				</p>
 			</div>
 
@@ -105,25 +104,25 @@ async function handleCreateClub(event: SubmitEvent) {
 					<div class="form-section">
 						<div class="input-header">
 							<span class="step-badge">1</span>
-							<label for="club-name-input" class="section-heading">Club Name</label>
+							<label for="club-name-input" class="section-heading">{t("wizard_club_name_label")}</label>
 						</div>
 						<Input
 							id="club-name-input"
-							placeholder="e.g. Midnight Sci-Fi Club"
+							placeholder={t("wizard_club_name_placeholder")}
 							maxlength={CLUB_NAME_MAX_LENGTH}
 							bind:value={clubName}
 							required
 							disabled={isSubmitting}
 						/>
 						<div class="char-counter">
-							{clubName.length} / {CLUB_NAME_MAX_LENGTH} characters
+							{clubName.length} / {CLUB_NAME_MAX_LENGTH}
 						</div>
 					</div>
 
 					<div class="form-section">
 						<div class="input-header">
 							<span class="step-badge">2</span>
-							<span class="section-heading">Reading Cadence</span>
+							<span class="section-heading">{t("wizard_cadence_label")}</span>
 						</div>
 						<div class="cadence-grid">
 							{#each CADENCE_TYPES as cadence}
@@ -133,14 +132,22 @@ async function handleCreateClub(event: SubmitEvent) {
 									class:selected={selectedCadence === cadence}
 									onclick={() => (selectedCadence = cadence)}
 								>
-									<span class="cadence-name">{cadence}</span>
+									<span class="cadence-name">
+										{#if cadence === "weekly"}
+											{t("cadence_weekly")}
+										{:else if cadence === "monthly"}
+											{t("cadence_monthly")}
+										{:else}
+											{t("cadence_custom")}
+										{/if}
+									</span>
 									<span class="cadence-desc">
 										{#if cadence === "weekly"}
-											7 days per book
+											{t("wizard_cadence_weekly_desc")}
 										{:else if cadence === "monthly"}
-											Calendar month
+											{t("wizard_cadence_monthly_desc")}
 										{:else}
-											Admin set date
+											{t("wizard_cadence_custom_desc")}
 										{/if}
 									</span>
 								</button>
@@ -151,7 +158,7 @@ async function handleCreateClub(event: SubmitEvent) {
 					<div class="form-section">
 						<div class="input-header">
 							<span class="step-badge">3</span>
-							<span class="section-heading">Review Format</span>
+							<span class="section-heading">{t("ratings_rubric_header")}</span>
 						</div>
 						<button
 							type="button"
@@ -160,13 +167,13 @@ async function handleCreateClub(event: SubmitEvent) {
 							onclick={() => (advancedReviews = !advancedReviews)}
 						>
 							<div class="toggle-info">
-								<span class="toggle-title">Advanced Multi-Criteria Reviews</span>
+								<span class="toggle-title">{t("wizard_rubrics_title")}</span>
 								<span class="toggle-desc">
-									Enable scoring across Plot, Characters, Pacing, Writing, and Emotion alongside standard 5-star ratings.
+									{t("wizard_rubrics_desc")}
 								</span>
 							</div>
 							<div class="toggle-switch-badge">
-								{advancedReviews ? "ENABLED" : "STANDARD"}
+								{advancedReviews ? t("cadence_status_active").toUpperCase() : "STANDARD"}
 							</div>
 						</button>
 					</div>
@@ -174,7 +181,7 @@ async function handleCreateClub(event: SubmitEvent) {
 					<div class="form-section">
 						<div class="input-header">
 							<span class="step-badge">4</span>
-							<span class="section-heading">Invite Code Preview</span>
+							<span class="section-heading">{t("wizard_invite_code_label")}</span>
 						</div>
 						<div class="code-preview-card">
 							<div class="code-display">
@@ -187,7 +194,7 @@ async function handleCreateClub(event: SubmitEvent) {
 								onclick={handleRegenerateCode}
 								disabled={isSubmitting}
 							>
-								Regenerate
+								{t("wizard_regenerate_button")}
 							</Button>
 						</div>
 					</div>
@@ -199,7 +206,7 @@ async function handleCreateClub(event: SubmitEvent) {
 						fullWidth
 						disabled={isSubmitting}
 					>
-						{isSubmitting ? "Creating Club..." : "Create Reading Club"}
+						{isSubmitting ? t("wizard_creating_button") : t("wizard_create_button")}
 					</Button>
 				</form>
 			</Card>
