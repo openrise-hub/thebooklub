@@ -5,12 +5,27 @@ import { POST } from "./+server";
 function createMockVoteEvent(options: {
 	clubId?: string;
 	body?: Record<string, unknown>;
+	user?: unknown;
 }): RequestEvent {
-	const { clubId, body } = options;
+	const {
+		clubId,
+		body,
+		user = {
+			id: "user-1",
+			email: "member@club.com",
+			username: "MemberUser",
+			isEmailVerified: true,
+			avatarUrl: "",
+			createdAt: Date.now(),
+		},
+	} = options;
 	return {
 		params: clubId !== undefined ? { id: clubId } : {},
 		request: {
 			json: async () => body ?? {},
+		},
+		locals: {
+			user,
 		},
 	} as unknown as RequestEvent;
 }

@@ -97,4 +97,19 @@ describe("POST /api/club/[id]/cadence", () => {
 		expect(data.purgeAborted).toBe(true);
 		expect(data.endDate).toBe(futureDate);
 	});
+
+	it("returns 403 Forbidden if non-admin member attempts cadence modification", async () => {
+		const futureDate = Date.now() + 7 * 24 * 60 * 60 * 1000;
+		const event = createMockCadenceEvent(verifiedUser, "club-1", {
+			endDate: futureDate,
+			cadence: "custom",
+			userRole: "member",
+		});
+		const response = await POST(event);
+		const data = await response.json();
+
+		expect(response.status).toBe(403);
+		expect(data.success).toBe(false);
+		expect(data.error).toContain("Only club administrators");
+	});
 });

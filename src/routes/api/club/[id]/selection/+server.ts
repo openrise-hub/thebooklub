@@ -18,14 +18,20 @@ export const GET: RequestHandler = async ({ params }) => {
 	});
 };
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	const user = locals.user;
 	const clubId = params.id;
 	if (!clubId) {
 		return json({ error: "Missing club ID" }, { status: 400 });
 	}
 
+	if (!user) {
+		return json({ error: "Authentication required to configure book selection" }, { status: 401 });
+	}
+
 	let body: {
 		mode?: SelectionMode;
+		userRole?: "admin" | "member";
 		candidates?: Array<{
 			id?: string;
 			title: string;
@@ -40,6 +46,13 @@ export const POST: RequestHandler = async ({ params, request }) => {
 		body = await request.json();
 	} catch {
 		return json({ error: "Invalid JSON payload" }, { status: 400 });
+	}
+
+	if (body.userRole && body.userRole !== "admin") {
+		return json(
+			{ error: "Only club administrators can configure book selection" },
+			{ status: 403 },
+		);
 	}
 
 	const rawCandidates = body.candidates || [];
