@@ -6,6 +6,7 @@ import Avatar from "$lib/components/Avatar.svelte";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import DiscussionFeed from "$lib/components/DiscussionFeed.svelte";
+import LanguageSwitch from "$lib/components/LanguageSwitch.svelte";
 import PDFViewer from "$lib/components/PDFViewer.svelte";
 import RaceTrack from "$lib/components/RaceTrack.svelte";
 import ReviewBreakdown from "$lib/components/ReviewBreakdown.svelte";
@@ -174,6 +175,7 @@ onDestroy(() => {
 						<span class="user-name">{data.members[0].username}</span>
 					</div>
 				{/if}
+				<LanguageSwitch />
 				<ThemeSwitch />
 			</div>
 		</div>
