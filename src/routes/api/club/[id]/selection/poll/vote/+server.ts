@@ -1,9 +1,17 @@
 import { type RequestHandler, json } from "@sveltejs/kit";
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
+	const user = locals.user;
 	const clubId = params.id;
 	if (!clubId) {
 		return json({ error: "Missing club ID" }, { status: 400 });
+	}
+
+	if (!user) {
+		return json(
+			{ error: "Authentication required to vote in book selection poll" },
+			{ status: 401 },
+		);
 	}
 
 	let body: {

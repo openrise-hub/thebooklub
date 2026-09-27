@@ -4,6 +4,7 @@ import { type RequestHandler, json } from "@sveltejs/kit";
 export interface CadenceUpdateBody {
 	endDate: number;
 	cadence?: CadenceType;
+	userRole?: "admin" | "member";
 }
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
@@ -23,6 +24,13 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		body = await request.json();
 	} catch {
 		return json({ success: false, error: "Invalid JSON request body" }, { status: 400 });
+	}
+
+	if (body.userRole && body.userRole !== "admin") {
+		return json(
+			{ success: false, error: "Only club administrators can modify cadence and deadlines" },
+			{ status: 403 },
+		);
 	}
 
 	if (!body.endDate || typeof body.endDate !== "number" || Number.isNaN(body.endDate)) {
