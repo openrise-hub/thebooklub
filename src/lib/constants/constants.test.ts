@@ -53,6 +53,7 @@ import {
 } from "./ratings";
 import { ROUTES } from "./routes";
 import {
+<<<<<<< HEAD
 	DEFAULT_SOCIAL_CARD_FORMAT,
 	SOCIAL_CARD_DIMENSIONS,
 	SOCIAL_CARD_FORMATS,
@@ -60,6 +61,16 @@ import {
 	SOCIAL_CARD_MIME_TYPE,
 	SOCIAL_CARD_PIXEL_RATIO,
 } from "./social";
+=======
+	DEFAULT_POLL_HOURS,
+	DEFAULT_SELECTION_MODE,
+	POLL_DURATION_PRESETS_HOURS,
+	SELECTION_COLOR_PALETTE,
+	SELECTION_MODES,
+	SELECTION_STATUSES,
+	SELECTION_THEME_COLORS,
+} from "./selection";
+>>>>>>> b974f1c (feat(selection): add selection helpers and constants)
 import {
 	ALLOWED_PDF_MIME_TYPES,
 	DEFAULT_ZOOM,
@@ -269,6 +280,18 @@ describe("Export Constants", () => {
 		expect(EXPORT_MIME_TYPES.json).toBe("application/json");
 		expect(EXPORT_MIME_TYPES.csv).toBe("text/csv;charset=utf-8");
 		expect(DEFAULT_EXPORT_FORMAT).toBe("json");
+	});
+});
+
+describe("Selection Constants", () => {
+	it("defines selection modes, theme colors, and duration presets", () => {
+		expect(SELECTION_MODES).toEqual(["roulette", "poll"]);
+		expect(SELECTION_STATUSES).toEqual(["draft", "active", "completed"]);
+		expect(SELECTION_THEME_COLORS).toEqual(["purple", "blue", "green", "yellow", "red"]);
+		expect(SELECTION_COLOR_PALETTE.length).toBe(12);
+		expect(POLL_DURATION_PRESETS_HOURS).toEqual([1, 6, 12, 24, 48, 72]);
+		expect(DEFAULT_SELECTION_MODE).toBe("roulette");
+		expect(DEFAULT_POLL_HOURS).toBe(24);
 	});
 });
 
