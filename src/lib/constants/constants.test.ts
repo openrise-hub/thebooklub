@@ -32,6 +32,7 @@ import {
 	MIN_CANDIDATE_BOOKS,
 } from "./club";
 import { MESSAGE_MAX_LENGTH, MESSAGE_MIN_LENGTH, PAGE_REF_BOOK_WIDE } from "./discussion";
+<<<<<<< HEAD
 import { DEFAULT_EXPORT_FORMAT, EXPORT_FORMATS, EXPORT_MIME_TYPES } from "./export";
 import {
 	COPY_FEEDBACK_DURATION_MS,
@@ -41,6 +42,9 @@ import {
 	QR_CODE_ERROR_CORRECTION_LEVEL,
 	QR_CODE_HIGH_RES_WIDTH,
 } from "./qr";
+=======
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, LOCALE_LABELS, SUPPORTED_LOCALES } from "./i18n";
+>>>>>>> 6bbf01e (feat(i18n): add paraglide dependency and constants)
 import {
 	ADVANCED_CRITERIA_KEYS,
 	CRITERIA_MAX_SCORE,
@@ -267,6 +271,7 @@ describe("Avatar Constants", () => {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 describe("Social Constants", () => {
 	it("defines social card formats, dimensions, and limits", () => {
 		expect(SOCIAL_CARD_FORMATS).toEqual(["story", "post"]);
@@ -322,6 +327,16 @@ describe("Selection Constants", () => {
 		expect(ROULETTE_POINTER_ANGLE_DEG).toBe(270);
 		expect(ROULETTE_EASING_CSS).toBe("cubic-bezier(0.15, 0.9, 0.2, 1.0)");
 		expect(ROULETTE_SPIN_DURATION_MS).toBe(5000);
+	});
+});
+
+describe("i18n Constants", () => {
+	it("defines supported locales, labels, and cookie token", () => {
+		expect(SUPPORTED_LOCALES).toEqual(["en", "es"]);
+		expect(DEFAULT_LOCALE).toBe("en");
+		expect(LOCALE_COOKIE_NAME).toBe("app_locale");
+		expect(LOCALE_LABELS.en).toBe("English");
+		expect(LOCALE_LABELS.es).toBe("Español");
 	});
 });
 
