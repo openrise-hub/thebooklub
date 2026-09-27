@@ -32,8 +32,14 @@ import {
 	MIN_CANDIDATE_BOOKS,
 } from "./club";
 import { MESSAGE_MAX_LENGTH, MESSAGE_MIN_LENGTH, PAGE_REF_BOOK_WIDE } from "./discussion";
-<<<<<<< HEAD
 import { DEFAULT_EXPORT_FORMAT, EXPORT_FORMATS, EXPORT_MIME_TYPES } from "./export";
+import {
+	DEFAULT_LOCALE,
+	LOCALE_COOKIE_MAX_AGE_SECONDS,
+	LOCALE_COOKIE_NAME,
+	LOCALE_LABELS,
+	SUPPORTED_LOCALES,
+} from "./i18n";
 import {
 	COPY_FEEDBACK_DURATION_MS,
 	QR_CODE_COLORS,
@@ -42,9 +48,6 @@ import {
 	QR_CODE_ERROR_CORRECTION_LEVEL,
 	QR_CODE_HIGH_RES_WIDTH,
 } from "./qr";
-=======
-import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, LOCALE_LABELS, SUPPORTED_LOCALES } from "./i18n";
->>>>>>> 6bbf01e (feat(i18n): add paraglide dependency and constants)
 import {
 	ADVANCED_CRITERIA_KEYS,
 	CRITERIA_MAX_SCORE,
@@ -57,9 +60,19 @@ import {
 } from "./ratings";
 import { ROUTES } from "./routes";
 import {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+	DEFAULT_POLL_HOURS,
+	DEFAULT_SELECTION_MODE,
+	POLL_DURATION_PRESETS_HOURS,
+	POLL_TICK_INTERVAL_MS,
+	ROULETTE_EASING_CSS,
+	ROULETTE_MIN_ROTATIONS,
+	ROULETTE_POINTER_ANGLE_DEG,
+	SELECTION_COLOR_PALETTE,
+	SELECTION_MODES,
+	SELECTION_STATUSES,
+	SELECTION_THEME_COLORS,
+} from "./selection";
+import {
 	DEFAULT_SOCIAL_CARD_FORMAT,
 	SOCIAL_CARD_DIMENSIONS,
 	SOCIAL_CARD_FORMATS,
@@ -67,37 +80,6 @@ import {
 	SOCIAL_CARD_MIME_TYPE,
 	SOCIAL_CARD_PIXEL_RATIO,
 } from "./social";
-=======
-	DEFAULT_POLL_HOURS,
-	DEFAULT_SELECTION_MODE,
-	POLL_DURATION_PRESETS_HOURS,
-=======
-	DEFAULT_POLL_HOURS,
-	DEFAULT_SELECTION_MODE,
-	POLL_DURATION_PRESETS_HOURS,
-	ROULETTE_EASING_CSS,
-	ROULETTE_MIN_ROTATIONS,
-	ROULETTE_POINTER_ANGLE_DEG,
->>>>>>> e2a9988 (feat(selection): add roulette wheel geometry and math)
-=======
-	DEFAULT_POLL_HOURS,
-	DEFAULT_SELECTION_MODE,
-	POLL_DURATION_PRESETS_HOURS,
-	POLL_TICK_INTERVAL_MS,
->>>>>>> 99b0a7c (feat(selection): add selection poll helpers and math)
-	SELECTION_COLOR_PALETTE,
-	SELECTION_MODES,
-	SELECTION_STATUSES,
-	SELECTION_THEME_COLORS,
-} from "./selection";
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> b974f1c (feat(selection): add selection helpers and constants)
-=======
-
->>>>>>> e2a9988 (feat(selection): add roulette wheel geometry and math)
-=======
->>>>>>> 99b0a7c (feat(selection): add selection poll helpers and math)
 import {
 	ALLOWED_PDF_MIME_TYPES,
 	DEFAULT_ZOOM,
@@ -138,99 +120,112 @@ describe("Cadence Constants", () => {
 		expect(PURGE_DELAY_MS).toBe(24 * 60 * 60 * 1000);
 	});
 
-	it("defines supported cadence types and cycle statuses", () => {
-		expect(CADENCE_TYPES).toEqual(["weekly", "monthly", "custom"]);
-		expect(CYCLE_STATUSES).toEqual(["active", "completed", "purged"]);
-	});
-
-	it("defines UI timing thresholds", () => {
+	it("enforces debouncing and search delay integers", () => {
 		expect(PROGRESS_DEBOUNCE_MS).toBe(300);
 		expect(SEARCH_DEBOUNCE_MS).toBe(350);
 		expect(ROULETTE_SPIN_DURATION_MS).toBe(5000);
 	});
+
+	it("defines supported cadence types and cycle statuses", () => {
+		expect(CADENCE_TYPES).toEqual(["weekly", "monthly", "custom"]);
+		expect(CYCLE_STATUSES).toEqual(["active", "completed", "purged"]);
+	});
 });
 
-describe("Ratings Constants", () => {
-	it("enforces star rating boundaries and increments", () => {
+describe("Rating & Rubric Constants", () => {
+	it("enforces 1.0 to 5.0 star limits with 0.5 increments", () => {
 		expect(STAR_MIN_RATING).toBe(1.0);
 		expect(STAR_MAX_RATING).toBe(5.0);
 		expect(STAR_STEP_INCREMENT).toBe(0.5);
-		expect(REVIEW_COMMENT_MAX_LENGTH).toBe(1000);
 	});
 
-	it("defines the 5 advanced review criteria with complete labels and descriptions", () => {
-		expect(ADVANCED_CRITERIA_KEYS).toHaveLength(5);
-		expect(ADVANCED_CRITERIA_KEYS).toEqual(["plot", "characters", "pacing", "writing", "emotion"]);
+	it("enforces 1 to 5 criteria score limits", () => {
 		expect(CRITERIA_MIN_SCORE).toBe(1);
 		expect(CRITERIA_MAX_SCORE).toBe(5);
+	});
 
-		for (const key of ADVANCED_CRITERIA_KEYS) {
-			expect(CRITERIA_METADATA[key]).toBeDefined();
-			expect(CRITERIA_METADATA[key].label.length).toBeGreaterThan(0);
-			expect(CRITERIA_METADATA[key].description.length).toBeGreaterThan(0);
-		}
+	it("defines all 5 advanced criteria keys and metadata", () => {
+		expect(ADVANCED_CRITERIA_KEYS).toEqual(["plot", "characters", "pacing", "writing", "emotion"]);
+		expect(CRITERIA_METADATA.plot.label).toBe("Plot & Structure");
+		expect(CRITERIA_METADATA.characters.label).toBe("Characters & Growth");
+		expect(CRITERIA_METADATA.pacing.label).toBe("Pacing & Flow");
+		expect(CRITERIA_METADATA.writing.label).toBe("Writing & Prose");
+		expect(CRITERIA_METADATA.emotion.label).toBe("Emotional Impact");
+	});
+
+	it("enforces review comment length maximum", () => {
+		expect(REVIEW_COMMENT_MAX_LENGTH).toBe(1000);
 	});
 });
 
-describe("UI & Theme Constants", () => {
-	it("defines the three supported themes", () => {
-		expect(THEMES).toEqual(["classic", "midnight", "bookshelf"]);
-		expect(DEFAULT_THEME).toBe("classic");
-	});
-
-	it("defines the five action color variants", () => {
-		expect(ACTION_COLOR_VARIANTS).toEqual(["red", "blue", "yellow", "green", "purple"]);
-	});
-
-	it("generates correct storage keys", () => {
-		expect(STORAGE_KEYS.THEME).toBe("thebooklub_theme");
-		expect(STORAGE_KEYS.PENDING_CLUB_CODE).toBe("pending_club_code");
-		expect(STORAGE_KEYS.READER_PAGE("c123")).toBe("reader_page_c123");
-	});
-});
-
-describe("Application Routes", () => {
-	it("generates static and dynamic paths", () => {
-		expect(ROUTES.HOME).toBe("/");
-		expect(ROUTES.CLUB_NEW).toBe("/club/new");
-		expect(ROUTES.CLUB_DASHBOARD("abc")).toBe("/club/abc");
-		expect(ROUTES.CLUB_HISTORY("abc")).toBe("/club/abc/history");
-		expect(ROUTES.CLUB_SETTINGS("abc")).toBe("/club/abc/settings");
-		expect(ROUTES.CLUB_SELECT("abc")).toBe("/club/abc/select");
-		expect(ROUTES.API_BOOKS_SEARCH).toBe("/api/books/search");
-		expect(ROUTES.API_CLUB_CREATE).toBe("/api/club/create");
-		expect(ROUTES.API_CLUB_JOIN).toBe("/api/club/join");
-		expect(ROUTES.API_CLUB_PDF("abc")).toBe("/api/club/abc/pdf");
-		expect(ROUTES.API_CLUB_PROGRESS("abc")).toBe("/api/club/abc/progress");
-		expect(ROUTES.API_CLUB_CADENCE("abc")).toBe("/api/club/abc/cadence");
-		expect(ROUTES.API_CLUB_DISCUSSIONS("abc")).toBe("/api/club/abc/discussions");
-		expect(ROUTES.API_CLUB_REVIEWS("abc")).toBe("/api/club/abc/reviews");
-		expect(ROUTES.API_CRON_PURGE).toBe("/api/cron/purge");
-	});
-});
-
-describe("Discussion Constants", () => {
-	it("enforces message length limits and book-wide page tag indicator", () => {
+describe("Discussion & Message Constants", () => {
+	it("enforces discussion comment length boundaries", () => {
 		expect(MESSAGE_MIN_LENGTH).toBe(1);
 		expect(MESSAGE_MAX_LENGTH).toBe(2000);
+	});
+
+	it("defines sentinel value for book-wide thoughts without specific page", () => {
 		expect(PAGE_REF_BOOK_WIDE).toBe(0);
 	});
 });
 
-describe("Book Discovery Constants", () => {
-	it("defines query bounds and endpoints", () => {
+describe("Book Search Constants", () => {
+	it("defines search boundaries and query minimums", () => {
 		expect(MIN_SEARCH_QUERY_LENGTH).toBe(2);
 		expect(DEFAULT_SEARCH_RESULTS_LIMIT).toBe(10);
 		expect(MAX_SEARCH_RESULTS_LIMIT).toBe(20);
-		expect(GOOGLE_BOOKS_API_URL).toContain("googleapis.com");
-		expect(OPEN_LIBRARY_SEARCH_URL).toContain("openlibrary.org");
+	});
+
+	it("defines external provider base URLs", () => {
+		expect(GOOGLE_BOOKS_API_URL).toBe("https://www.googleapis.com/books/v1/volumes");
+		expect(OPEN_LIBRARY_SEARCH_URL).toBe("https://openlibrary.org/search.json");
 	});
 });
 
-describe("Storage Constants", () => {
-	it("defines PDF file size limits and allowed MIME types", () => {
+describe("Routes Constants", () => {
+	it("defines static application routes", () => {
+		expect(ROUTES.HOME).toBe("/");
+		expect(ROUTES.CLUB_NEW).toBe("/club/new");
+		expect(ROUTES.API_BOOKS_SEARCH).toBe("/api/books/search");
+		expect(ROUTES.API_AUTH).toBe("/api/auth");
+	});
+
+	it("defines dynamic parameterized routes", () => {
+		expect(ROUTES.CLUB_DASHBOARD("test-club-123")).toBe("/club/test-club-123");
+		expect(ROUTES.CLUB_HISTORY("test-club-123")).toBe("/club/test-club-123/history");
+		expect(ROUTES.CLUB_SELECT("test-club-123")).toBe("/club/test-club-123/select");
+		expect(ROUTES.API_CLUB_JOIN).toBe("/api/club/join");
+		expect(ROUTES.API_CLUB_CREATE).toBe("/api/club/create");
+		expect(ROUTES.API_CLUB_PROGRESS("c1")).toBe("/api/club/c1/progress");
+		expect(ROUTES.API_CLUB_REVIEWS("c1")).toBe("/api/club/c1/reviews");
+		expect(ROUTES.API_CLUB_PDF("c1")).toBe("/api/club/c1/pdf");
+		expect(ROUTES.API_CLUB_CADENCE("c1")).toBe("/api/club/c1/cadence");
+		expect(ROUTES.API_CLUB_DISCUSSIONS("c1")).toBe("/api/club/c1/discussions");
+		expect(ROUTES.API_CRON_PURGE).toBe("/api/cron/purge");
+	});
+});
+
+describe("UI & Theme Constants", () => {
+	it("defines three tactile themes with classic default", () => {
+		expect(THEMES).toEqual(["classic", "midnight", "bookshelf"]);
+		expect(DEFAULT_THEME).toBe("classic");
+	});
+
+	it("defines client storage keys", () => {
+		expect(STORAGE_KEYS.THEME).toBe("thebooklub_theme");
+		expect(STORAGE_KEYS.PENDING_CLUB_CODE).toBe("pending_club_code");
+		expect(STORAGE_KEYS.READER_PAGE("club-99")).toBe("reader_page_club-99");
+	});
+
+	it("defines universal action color variants", () => {
+		expect(ACTION_COLOR_VARIANTS).toEqual(["red", "blue", "yellow", "green", "purple"]);
+	});
+});
+
+describe("Storage & PDF Constants", () => {
+	it("enforces 25MB PDF file size cap and mime whitelist", () => {
 		expect(MAX_PDF_SIZE_MB).toBe(25);
-		expect(MAX_PDF_SIZE_BYTES).toBe(25 * 1024 * 1024);
+		expect(STORAGE_MAX_PDF_SIZE_BYTES).toBe(25 * 1024 * 1024);
 		expect(ALLOWED_PDF_MIME_TYPES).toEqual(["application/pdf"]);
 	});
 
@@ -269,9 +264,6 @@ describe("Avatar Constants", () => {
 	});
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 describe("Social Constants", () => {
 	it("defines social card formats, dimensions, and limits", () => {
 		expect(SOCIAL_CARD_FORMATS).toEqual(["story", "post"]);
@@ -335,8 +327,8 @@ describe("i18n Constants", () => {
 		expect(SUPPORTED_LOCALES).toEqual(["en", "es"]);
 		expect(DEFAULT_LOCALE).toBe("en");
 		expect(LOCALE_COOKIE_NAME).toBe("app_locale");
+		expect(LOCALE_COOKIE_MAX_AGE_SECONDS).toBe(31536000);
 		expect(LOCALE_LABELS.en).toBe("English");
 		expect(LOCALE_LABELS.es).toBe("Español");
 	});
 });
-

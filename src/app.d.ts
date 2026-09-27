@@ -6,9 +6,11 @@ declare global {
 		interface Locals {
 			user: import("$lib/server/auth").UserSession | null;
 			env: import("$lib/server/env").ServerEnv;
+			locale: import("$lib/constants/i18n").SupportedLocale;
 		}
 		interface PageData {
 			user?: import("$lib/server/auth").UserSession | null;
+			locale?: import("$lib/constants/i18n").SupportedLocale;
 		}
 		// interface PageState {}
 		// interface Platform {}
