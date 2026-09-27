@@ -4,6 +4,7 @@ import { generateInviteCode } from "$lib/club/generator";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import Input from "$lib/components/Input.svelte";
+import LanguageSwitch from "$lib/components/LanguageSwitch.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { CADENCE_TYPES, type CadenceType } from "$lib/constants/cadence";
 import { CLUB_NAME_MAX_LENGTH, CLUB_NAME_MIN_LENGTH } from "$lib/constants/club";
@@ -77,7 +78,10 @@ async function handleCreateClub(event: SubmitEvent) {
 				</span>
 				<span class="brand-title">The Book Club</span>
 			</a>
-			<ThemeSwitch />
+			<div class="header-actions">
+				<LanguageSwitch />
+				<ThemeSwitch />
+			</div>
 		</div>
 	</header>
 
@@ -224,6 +228,13 @@ async function handleCreateClub(event: SubmitEvent) {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 
 	.brand-link {

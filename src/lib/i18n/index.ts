@@ -1,6 +1,7 @@
-import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, type SupportedLocale } from "$lib/constants/i18n";
+import { DEFAULT_LOCALE, type SupportedLocale } from "$lib/constants/i18n";
 import en from "../../../messages/en.json";
 import es from "../../../messages/es.json";
+import { localeState } from "./state.svelte";
 
 export type MessageKey = keyof typeof en;
 
@@ -9,23 +10,18 @@ export const catalogs: Record<SupportedLocale, Record<string, string>> = {
 	es: es as Record<string, string>,
 };
 
-let currentLocale: SupportedLocale = DEFAULT_LOCALE;
-
 export function getLocale(): SupportedLocale {
-	return currentLocale;
+	return localeState.current;
 }
 
 export function setLocale(locale: SupportedLocale): void {
-	currentLocale = locale;
-	if (typeof document !== "undefined") {
-		document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; SameSite=Lax`;
-	}
+	localeState.set(locale);
 }
 
 export function t(
 	key: MessageKey,
 	params?: Record<string, string | number>,
-	locale: SupportedLocale = currentLocale,
+	locale: SupportedLocale = localeState.current,
 ): string {
 	const catalog = catalogs[locale] || catalogs[DEFAULT_LOCALE];
 	let message = catalog[key] || catalogs[DEFAULT_LOCALE][key] || key;

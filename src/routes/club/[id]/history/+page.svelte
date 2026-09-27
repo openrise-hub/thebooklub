@@ -1,6 +1,7 @@
 <script lang="ts">
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
+import LanguageSwitch from "$lib/components/LanguageSwitch.svelte";
 import Modal from "$lib/components/Modal.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { CRITERIA_MAX_SCORE, STAR_MAX_RATING } from "$lib/constants/ratings";
@@ -76,6 +77,7 @@ function closeDiscussionsModal() {
 			</div>
 
 			<div class="header-right">
+				<LanguageSwitch />
 				<ThemeSwitch />
 			</div>
 		</div>

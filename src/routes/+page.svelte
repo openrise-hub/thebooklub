@@ -7,6 +7,7 @@ import AuthModal from "$lib/components/AuthModal.svelte";
 import Button from "$lib/components/Button.svelte";
 import Card from "$lib/components/Card.svelte";
 import Input from "$lib/components/Input.svelte";
+import LanguageSwitch from "$lib/components/LanguageSwitch.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { ROUTES } from "$lib/constants/routes";
 import type { PageData } from "./$types";
@@ -118,6 +119,7 @@ async function handleAuthSuccess() {
 						Sign In
 					</Button>
 				{/if}
+				<LanguageSwitch />
 				<ThemeSwitch />
 			</div>
 		</div>
