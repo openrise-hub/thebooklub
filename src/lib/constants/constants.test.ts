@@ -147,10 +147,10 @@ describe("Rating & Rubric Constants", () => {
 	it("defines all 5 advanced criteria keys and metadata", () => {
 		expect(ADVANCED_CRITERIA_KEYS).toEqual(["plot", "characters", "pacing", "writing", "emotion"]);
 		expect(CRITERIA_METADATA.plot.label).toBe("Plot & Structure");
-		expect(CRITERIA_METADATA.characters.label).toBe("Characters & Growth");
+		expect(CRITERIA_METADATA.characters.label).toBe("Character Development");
 		expect(CRITERIA_METADATA.pacing.label).toBe("Pacing & Flow");
-		expect(CRITERIA_METADATA.writing.label).toBe("Writing & Prose");
-		expect(CRITERIA_METADATA.emotion.label).toBe("Emotional Impact");
+		expect(CRITERIA_METADATA.writing.label).toBe("Style & Prose");
+		expect(CRITERIA_METADATA.emotion.label).toBe("Emotional Resonance");
 	});
 
 	it("enforces review comment length maximum", () => {
