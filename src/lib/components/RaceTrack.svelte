@@ -1,12 +1,6 @@
 <script lang="ts">
+import { type RaceMember, formatRacerTooltip, groupMembersByPosition } from "$lib/club/progress";
 import Avatar from "./Avatar.svelte";
-
-interface RaceMember {
-	id: string;
-	username: string;
-	avatarUrl: string;
-	currentPage: number;
-}
 
 interface Props {
 	members: RaceMember[];
@@ -23,49 +17,63 @@ const checkpoints = [
 	{ label: "Finish", percent: 100 },
 ];
 
-function getMemberPercent(currentPage: number): number {
-	if (totalPages <= 0) return 0;
-	const ratio = (currentPage / totalPages) * 100;
-	return Math.min(100, Math.max(0, Math.round(ratio)));
-}
+const racerGroups = $derived(groupMembersByPosition(members, totalPages));
 </script>
 
-<div class="race-track-wrapper">
+<div class="race-track-wrapper" aria-label="Social Reading Race Track">
 	<div class="race-header">
 		<div class="race-title-group">
 			<span class="race-icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+					<path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/>
+				</svg>
 			</span>
 			<h3 class="race-title">Social Reading Race</h3>
 		</div>
-		<span class="race-stats">{members.length} {members.length === 1 ? "Reader" : "Readers"} on the track</span>
+		<span class="race-stats">
+			{members.length} {members.length === 1 ? "Reader" : "Readers"} on the track
+		</span>
 	</div>
 
 	<div class="track-card">
-		<div class="track-bar" role="progressbar" aria-valuemin={0} aria-valuemax={totalPages} aria-label="Reading progress race">
+		<div
+			class="track-bar"
+			role="progressbar"
+			aria-valuemin={0}
+			aria-valuemax={Math.max(1, totalPages)}
+			aria-label="Reading progress race"
+		>
 			{#each checkpoints as point}
 				<div class="checkpoint-line" style="left: {point.percent}%;">
 					<span class="checkpoint-label">{point.label}</span>
 				</div>
 			{/each}
 
-			<div class="racers-layer">
-				{#each members as member (member.id)}
-					{@const percent = getMemberPercent(member.currentPage)}
+			<div class="racers-layer" aria-label="Racers on track">
+				{#each racerGroups as group (group.page)}
+					{@const tooltip = formatRacerTooltip(group.members, group.page, totalPages, group.percent)}
 					<button
 						type="button"
-						class="racer-node"
-						style="left: calc({percent}% - 18px);"
-						aria-label="{member.username}: page {member.currentPage} of {totalPages} ({percent}%)"
+						class="racer-cluster-node"
+						class:is-tie={group.members.length > 1}
+						style="left: calc({group.percent}% - 18px);"
+						aria-label="{tooltip.title}: {tooltip.subtitle}"
 					>
-						<Avatar
-							src={member.avatarUrl}
-							username={member.username}
-							size="sm"
-						/>
-						<div class="racer-tooltip">
-							<span class="tooltip-name">{member.username}</span>
-							<span class="tooltip-page">Page {member.currentPage} / {totalPages} ({percent}%)</span>
+						<div class="avatar-stack">
+							{#each group.members as member, idx (member.id)}
+								<div class="stacked-avatar-wrapper" style="z-index: {idx + 1};">
+									<Avatar
+										src={member.avatarUrl}
+										username={member.username}
+										size="sm"
+									/>
+								</div>
+							{/each}
+						</div>
+
+						<div class="racer-tooltip" role="tooltip">
+							<span class="tooltip-name">{tooltip.title}</span>
+							<span class="tooltip-page">{tooltip.subtitle}</span>
 						</div>
 					</button>
 				{/each}
@@ -97,8 +105,9 @@ function getMemberPercent(currentPage: number): number {
 	}
 
 	.race-icon {
-		font-size: 1.25rem;
-		line-height: 1;
+		display: flex;
+		align-items: center;
+		color: var(--color-yellow);
 	}
 
 	.race-title {
@@ -122,14 +131,14 @@ function getMemberPercent(currentPage: number): number {
 		background-color: var(--bg-surface);
 		border: var(--border-chunky);
 		border-radius: var(--radius-lg);
-		box-shadow: var(--depth-card);
-		padding: 32px 20px 24px 20px;
+		box-shadow: 0 4px 0 var(--border-color);
+		padding: 36px 20px 24px 20px;
 		position: relative;
 	}
 
 	.track-bar {
 		position: relative;
-		height: 36px;
+		height: 40px;
 		background-color: var(--bg-surface-elevated);
 		border: 2.5px solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -167,11 +176,9 @@ function getMemberPercent(currentPage: number): number {
 		bottom: 0;
 	}
 
-	.racer-node {
+	.racer-cluster-node {
 		position: absolute;
-		top: -6px;
-		width: 36px;
-		height: 36px;
+		top: -4px;
 		background: none;
 		border: none;
 		padding: 0;
@@ -181,10 +188,31 @@ function getMemberPercent(currentPage: number): number {
 		transition: transform 0.15s ease, z-index 0.1s ease;
 	}
 
-	.racer-node:hover,
-	.racer-node:focus-visible {
-		transform: scale(1.2) translateY(-4px);
-		z-index: 20;
+	.racer-cluster-node:hover,
+	.racer-cluster-node:focus-visible {
+		transform: scale(1.15) translateY(-6px);
+		z-index: 30;
+	}
+
+	.avatar-stack {
+		display: flex;
+		flex-direction: column-reverse;
+		align-items: center;
+		margin-top: -6px;
+	}
+
+	.stacked-avatar-wrapper {
+		margin-top: -12px;
+		transition: transform 0.1s ease;
+	}
+
+	.stacked-avatar-wrapper:last-child {
+		margin-top: 0;
+	}
+
+	.racer-cluster-node:hover .stacked-avatar-wrapper,
+	.racer-cluster-node:focus-visible .stacked-avatar-wrapper {
+		margin-top: -4px;
 	}
 
 	.racer-tooltip {
@@ -206,13 +234,14 @@ function getMemberPercent(currentPage: number): number {
 		pointer-events: none;
 		opacity: 0;
 		transition: opacity 0.15s ease, transform 0.15s ease;
-		box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+		box-shadow: 0 4px 0 var(--border-color);
+		z-index: 40;
 	}
 
-	.racer-node:hover .racer-tooltip,
-	.racer-node:focus-visible .racer-tooltip {
+	.racer-cluster-node:hover .racer-tooltip,
+	.racer-cluster-node:focus-visible .racer-tooltip {
 		opacity: 1;
-		transform: translateX(-50%) translateY(-10px);
+		transform: translateX(-50%) translateY(-12px);
 	}
 
 	.tooltip-name {
@@ -226,17 +255,11 @@ function getMemberPercent(currentPage: number): number {
 
 	@media (max-width: 600px) {
 		.track-card {
-			padding: 28px 12px 20px 12px;
+			padding: 30px 12px 20px 12px;
 		}
 
 		.checkpoint-label {
 			font-size: 0.65rem;
-		}
-
-		.racer-node {
-			width: 32px;
-			height: 32px;
-			top: -4px;
 		}
 	}
 </style>
