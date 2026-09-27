@@ -1,12 +1,21 @@
 <script lang="ts">
 import "../app.css";
+import { localeState } from "$lib/i18n/state.svelte";
 import type { Snippet } from "svelte";
+import type { LayoutData } from "./$types";
 
 interface Props {
+	data?: LayoutData;
 	children?: Snippet;
 }
 
-const { children }: Props = $props();
+const { data, children }: Props = $props();
+
+$effect(() => {
+	if (data?.locale) {
+		localeState.init(data.locale);
+	}
+});
 </script>
 
 <div class="app-container">
