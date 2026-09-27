@@ -32,6 +32,7 @@ import {
 	MIN_CANDIDATE_BOOKS,
 } from "./club";
 import { MESSAGE_MAX_LENGTH, MESSAGE_MIN_LENGTH, PAGE_REF_BOOK_WIDE } from "./discussion";
+import { DEFAULT_EXPORT_FORMAT, EXPORT_FORMATS, EXPORT_MIME_TYPES } from "./export";
 import {
 	COPY_FEEDBACK_DURATION_MS,
 	QR_CODE_COLORS,
@@ -259,6 +260,15 @@ describe("QR Code Constants", () => {
 		expect(QR_CODE_COLORS.dark).toBe("#1a1a1a");
 		expect(QR_CODE_COLORS.light).toBe("#ffffff");
 		expect(COPY_FEEDBACK_DURATION_MS).toBe(2000);
+	});
+});
+
+describe("Export Constants", () => {
+	it("defines export formats and MIME types", () => {
+		expect(EXPORT_FORMATS).toEqual(["json", "csv"]);
+		expect(EXPORT_MIME_TYPES.json).toBe("application/json");
+		expect(EXPORT_MIME_TYPES.csv).toBe("text/csv;charset=utf-8");
+		expect(DEFAULT_EXPORT_FORMAT).toBe("json");
 	});
 });
 
