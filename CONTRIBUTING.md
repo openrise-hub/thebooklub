@@ -9,8 +9,8 @@ All contributors and maintainers are expected to adhere to the [Code of Conduct]
 ## Development Setup
 
 1. **Prerequisites:**
-   - Node.js (v20 or newer)
-   - npm
+   - Node.js (v22 or newer)
+   - npm (v10 or newer)
 
 2. **Installation:**
    ```bash
