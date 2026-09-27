@@ -1,6 +1,7 @@
 <script lang="ts">
 import { DEFAULT_ZOOM, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from "$lib/constants/storage";
 import { STORAGE_KEYS } from "$lib/constants/ui";
+import { t } from "$lib/i18n";
 import { onDestroy, onMount } from "svelte";
 import Button from "./Button.svelte";
 
@@ -331,7 +332,7 @@ onDestroy(() => {
 					ariaLabel="Close reader"
 				>
 					<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-					<span class="btn-text">Close</span>
+					<span class="btn-text">{t("common_close")}</span>
 				</Button>
 
 				<div class="book-info">
@@ -406,9 +407,9 @@ onDestroy(() => {
 					variant={isFitToWidth ? "purple" : "neutral"}
 					size="sm"
 					onclick={handleToggleFitToWidth}
-					ariaLabel="Fit page to width"
+					ariaLabel={t("pdf_fit_width")}
 				>
-					Fit Width
+					{t("pdf_fit_width")}
 				</Button>
 
 				<Button

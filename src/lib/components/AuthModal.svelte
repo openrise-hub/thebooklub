@@ -1,4 +1,5 @@
 <script lang="ts">
+import { t } from "$lib/i18n";
 import type { UserSession } from "$lib/server/auth";
 import Button from "./Button.svelte";
 import Input from "./Input.svelte";
@@ -90,7 +91,7 @@ function handleGoogleOAuth() {
 
 <Modal
 	{isOpen}
-	title={mode === "login" ? "Sign In" : "Create Account"}
+	title={mode === "login" ? t("auth_sign_in_tab") : t("auth_create_account_tab")}
 	onclose={handleClose}
 >
 	<div class="auth-modal-content">
@@ -100,7 +101,7 @@ function handleGoogleOAuth() {
 					<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-2-1.46c-1.19.69-2 1.99-2 3.46s.81 2.77 2 3.46V18H4v-2.54c1.19-.69 2-1.99 2-3.46 0-1.48-.8-2.77-1.99-3.46L4 6h16v2.54z"/></svg>
 				</span>
 				<span class="invite-text">
-					Joining Club: <strong>{pendingCode}</strong>
+					{t("landing_join_button")}: <strong>{pendingCode}</strong>
 				</span>
 			</div>
 		{/if}
@@ -112,7 +113,7 @@ function handleGoogleOAuth() {
 				class:active={mode === "register"}
 				onclick={() => switchMode("register")}
 			>
-				Create Account
+				{t("auth_create_account_tab")}
 			</button>
 			<button
 				type="button"
@@ -120,7 +121,7 @@ function handleGoogleOAuth() {
 				class:active={mode === "login"}
 				onclick={() => switchMode("login")}
 			>
-				Sign In
+				{t("auth_sign_in_tab")}
 			</button>
 		</div>
 
@@ -149,13 +150,13 @@ function handleGoogleOAuth() {
 						d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
 					/>
 				</svg>
-				Continue with Google
+				{t("auth_continue_google")}
 			</span>
 		</Button>
 
 		<div class="divider">
 			<span class="divider-line"></span>
-			<span class="divider-text">OR</span>
+			<span class="divider-text">{t("common_or").toUpperCase()}</span>
 			<span class="divider-line"></span>
 		</div>
 
@@ -169,7 +170,7 @@ function handleGoogleOAuth() {
 			{#if mode === "register"}
 				<Input
 					id="auth-username"
-					label="Username"
+					label={t("auth_username_label")}
 					placeholder="reader_hero"
 					bind:value={username}
 					required
@@ -179,7 +180,7 @@ function handleGoogleOAuth() {
 
 			<Input
 				id="auth-email"
-				label="Email Address"
+				label={t("auth_email_label")}
 				type="email"
 				placeholder="you@example.com"
 				bind:value={email}
@@ -189,7 +190,7 @@ function handleGoogleOAuth() {
 
 			<Input
 				id="auth-password"
-				label="Password"
+				label={t("auth_password_label")}
 				type="password"
 				placeholder="••••••••"
 				bind:value={password}
@@ -205,10 +206,10 @@ function handleGoogleOAuth() {
 				disabled={isLoading}
 			>
 				{isLoading
-					? "Please wait..."
+					? t("common_loading")
 					: mode === "register"
-						? (pendingCode ? "Create Account & Join" : "Create Account")
-						: (pendingCode ? "Sign In & Join" : "Sign In")}
+						? (pendingCode ? `${t("auth_create_account_tab")} & ${t("common_join")}` : t("auth_create_account_tab"))
+						: (pendingCode ? `${t("auth_sign_in_tab")} & ${t("common_join")}` : t("auth_sign_in_tab"))}
 			</Button>
 		</form>
 	</div>

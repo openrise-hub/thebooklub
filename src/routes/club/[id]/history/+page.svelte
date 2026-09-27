@@ -6,6 +6,7 @@ import Modal from "$lib/components/Modal.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { CRITERIA_MAX_SCORE, STAR_MAX_RATING } from "$lib/constants/ratings";
 import { ROUTES } from "$lib/constants/routes";
+import { t } from "$lib/i18n";
 import type { ArchivedReadingCycle } from "$lib/types/cycle";
 import type { PageData } from "./$types";
 
@@ -58,7 +59,7 @@ function closeDiscussionsModal() {
 </script>
 
 <svelte:head>
-	<title>{data.club.name} - History Archive</title>
+	<title>{data.club.name} - {t("history_title")}</title>
 </svelte:head>
 
 <div class="history-page">
@@ -67,12 +68,12 @@ function closeDiscussionsModal() {
 			<div class="header-left">
 				<a href={ROUTES.CLUB_DASHBOARD(data.club.id)} class="back-link">
 					<Button variant="neutral" size="sm">
-						&larr; Back to Club
+						&larr; {t("history_back_to_club")}
 					</Button>
 				</a>
 				<div class="club-title-group">
 					<h1 class="club-name">{data.club.name}</h1>
-					<span class="badge history-badge">History Archive</span>
+					<span class="badge history-badge">{t("history_title")}</span>
 				</div>
 			</div>
 

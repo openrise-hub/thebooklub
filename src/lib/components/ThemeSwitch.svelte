@@ -1,5 +1,6 @@
 <script lang="ts">
 import { DEFAULT_THEME, STORAGE_KEYS, THEMES, type Theme } from "$lib/constants/ui";
+import { type MessageKey, t } from "$lib/i18n";
 import { onMount } from "svelte";
 import Button from "./Button.svelte";
 
@@ -38,10 +39,10 @@ function setTheme(theme: Theme) {
 	}
 }
 
-const themeLabels: Record<Theme, { label: string }> = {
-	classic: { label: "Classic" },
-	midnight: { label: "Midnight" },
-	bookshelf: { label: "Bookshelf" },
+const themeKeys: Record<Theme, MessageKey> = {
+	classic: "theme_classic",
+	midnight: "theme_midnight",
+	bookshelf: "theme_bookshelf",
 };
 </script>
 
@@ -50,9 +51,9 @@ const themeLabels: Record<Theme, { label: string }> = {
 		variant="neutral"
 		size="sm"
 		onclick={cycleTheme}
-		ariaLabel="Switch color theme"
+		ariaLabel={t("theme_switch_aria")}
 	>
-		<span class="theme-name">{themeLabels[currentTheme].label} Theme</span>
+		<span class="theme-name">{t(themeKeys[currentTheme])} {t("theme_suffix")}</span>
 	</Button>
 </div>
 

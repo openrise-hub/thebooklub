@@ -1,6 +1,7 @@
 <script lang="ts">
 import { SEARCH_DEBOUNCE_MS } from "$lib/constants/cadence";
 import { ROUTES } from "$lib/constants/routes";
+import { t } from "$lib/i18n";
 import type { BookSearchResponse, NormalizedBook } from "$lib/types/book";
 import Button from "./Button.svelte";
 import Input from "./Input.svelte";
@@ -151,7 +152,7 @@ function handleConfirmSelection() {
 
 <Modal
 	{isOpen}
-	title={isManualMode ? "Manual Book Entry" : "Discover & Select Book"}
+	title={t("search_modal_title")}
 	onclose={handleClose}
 >
 	<div class="search-modal-body">
@@ -159,8 +160,8 @@ function handleConfirmSelection() {
 			<div class="search-bar-wrap">
 				<Input
 					id="book-search-input"
-					label="Search Catalog"
-					placeholder="Search by title, author, or ISBN..."
+					label={t("search_modal_title")}
+					placeholder={t("search_placeholder")}
 					bind:value={searchQuery}
 					oninput={handleSearchInput}
 					autocomplete="off"
@@ -170,7 +171,7 @@ function handleConfirmSelection() {
 			{#if isSearching}
 				<div class="search-status loading" role="status">
 					<span class="status-spinner" aria-hidden="true">⏳</span>
-					<span>Searching Google Books & Open Library...</span>
+					<span>{t("search_searching")}</span>
 				</div>
 			{:else if searchError}
 				<div class="search-status error" role="alert">
@@ -313,7 +314,7 @@ function handleConfirmSelection() {
 	{#snippet footer()}
 		<div class="modal-footer-actions">
 			<Button variant="neutral" size="sm" onclick={handleClose}>
-				Cancel
+				{t("common_cancel")}
 			</Button>
 			<Button
 				variant="purple"
@@ -321,7 +322,7 @@ function handleConfirmSelection() {
 				disabled={!isSelectionValid}
 				onclick={handleConfirmSelection}
 			>
-				Confirm Selection
+				{t("search_select_book")}
 			</Button>
 		</div>
 	{/snippet}

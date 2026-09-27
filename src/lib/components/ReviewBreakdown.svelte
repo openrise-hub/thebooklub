@@ -3,9 +3,9 @@ import {
 	ADVANCED_CRITERIA_KEYS,
 	type AdvancedCriteriaKey,
 	CRITERIA_MAX_SCORE,
-	CRITERIA_METADATA,
 	CRITERIA_MIN_SCORE,
 } from "$lib/constants/ratings";
+import { type MessageKey, t } from "$lib/i18n";
 import type { ReviewCriteriaScores } from "$lib/types/review";
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 const {
 	criteriaAverages = {},
 	totalReviews = 0,
-	title = "Multi-Criteria Rubric Breakdown",
+	title = t("ratings_breakdown_title"),
 }: Props = $props();
 
 const criteriaColors: Record<AdvancedCriteriaKey, string> = {
@@ -52,7 +52,7 @@ function formatScore(score: number): string {
 		<div class="header-text-group">
 			<h4 class="breakdown-title">{title}</h4>
 			<span class="breakdown-subtitle">
-				5-dimensional evaluation across {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
+				{t("ratings_club_average")} ({totalReviews})
 			</span>
 		</div>
 		<div class="rubric-badge">
@@ -64,14 +64,13 @@ function formatScore(score: number): string {
 		{#each ADVANCED_CRITERIA_KEYS as key}
 			{@const score = getScore(key)}
 			{@const percent = getPercentage(score)}
-			{@const meta = CRITERIA_METADATA[key]}
 			{@const color = criteriaColors[key]}
 
 			<div class="criterion-item" data-criterion={key}>
 				<div class="criterion-header">
 					<div class="criterion-info">
-						<span class="criterion-name">{meta.label}</span>
-						<span class="criterion-desc">{meta.description}</span>
+						<span class="criterion-name">{t(`ratings_${key}_title` as MessageKey)}</span>
+						<span class="criterion-desc">{t(`ratings_${key}_desc` as MessageKey)}</span>
 					</div>
 					<div class="criterion-score-badge">
 						<span class="score-val" style="color: {color};">{formatScore(score)}</span>
@@ -82,7 +81,7 @@ function formatScore(score: number): string {
 				<div
 					class="criterion-bar-track"
 					role="progressbar"
-					aria-label="{meta.label} score"
+					aria-label="{t(`ratings_${key}_title` as MessageKey)} score"
 					aria-valuenow={score}
 					aria-valuemin={CRITERIA_MIN_SCORE}
 					aria-valuemax={CRITERIA_MAX_SCORE}

@@ -14,6 +14,7 @@ import ReviewModal from "$lib/components/ReviewModal.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { type AdvancedCriteriaKey, CRITERIA_METADATA } from "$lib/constants/ratings";
 import { ROUTES } from "$lib/constants/routes";
+import { type MessageKey, t } from "$lib/i18n";
 import type { Review } from "$lib/types/review";
 import { onDestroy } from "svelte";
 import type { PageData } from "./$types";
@@ -95,13 +96,15 @@ function handleReviewSubmitted(newReview: Review) {
 	totalReviewsCount = reviewsList.length;
 }
 
-const tabs = [
-	{ id: "discussion", label: "Discussion" },
-	{ id: "reviews", label: "Reviews" },
-	{ id: "selection", label: "Book Selection" },
-	{ id: "history", label: "History" },
-	{ id: "settings", label: "Settings" },
-] as const;
+const tabKeys: Record<string, MessageKey> = {
+	discussion: "nav_discussion",
+	reviews: "nav_reviews",
+	selection: "nav_selection",
+	history: "nav_history",
+	settings: "nav_settings",
+};
+
+const tabIds = ["discussion", "reviews", "selection", "history", "settings"] as const;
 
 let cycleEvaluation = $derived(data.activeCycle ? evaluateCycleState(data.activeCycle) : null);
 
@@ -286,18 +289,18 @@ onDestroy(() => {
 
 			<section class="tabs-section">
 				<div class="tabs-nav" role="tablist">
-					{#each tabs as tab}
+					{#each tabIds as tabId}
 						<button
 							type="button"
 							role="tab"
-							id="tab-{tab.id}"
-							aria-selected={activeTab === tab.id}
-							aria-controls="panel-{tab.id}"
+							id="tab-{tabId}"
+							aria-selected={activeTab === tabId}
+							aria-controls="panel-{tabId}"
 							class="tab-button"
-							class:active={activeTab === tab.id}
-							onclick={() => (activeTab = tab.id)}
+							class:active={activeTab === tabId}
+							onclick={() => (activeTab = tabId)}
 						>
-							<span class="tab-label">{tab.label}</span>
+							<span class="tab-label">{t(tabKeys[tabId])}</span>
 						</button>
 					{/each}
 				</div>

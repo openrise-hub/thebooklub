@@ -10,6 +10,7 @@ import Input from "$lib/components/Input.svelte";
 import LanguageSwitch from "$lib/components/LanguageSwitch.svelte";
 import ThemeSwitch from "$lib/components/ThemeSwitch.svelte";
 import { ROUTES } from "$lib/constants/routes";
+import { t } from "$lib/i18n";
 import type { PageData } from "./$types";
 
 let { data }: { data: PageData } = $props();
@@ -49,7 +50,7 @@ async function handleJoinSubmit(event?: SubmitEvent) {
 
 	const result = validateInviteCode(clubCode);
 	if (!result.valid) {
-		errorMessage = result.error || "Invalid club code";
+		errorMessage = result.error || t("landing_error_invalid_code");
 		return;
 	}
 
@@ -85,7 +86,7 @@ async function handleAuthSuccess() {
 </script>
 
 <svelte:head>
-	<title>The Book Club - Join Your Reading Group</title>
+	<title>{t("app_name")} - {t("landing_join_button")}</title>
 </svelte:head>
 
 <div class="landing-page">
@@ -95,7 +96,7 @@ async function handleAuthSuccess() {
 				<span class="brand-badge" aria-hidden="true">
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
 				</span>
-				<span class="brand-title">The Book Club</span>
+				<span class="brand-title">{t("app_name")}</span>
 			</div>
 			<div class="header-actions">
 				{#if data.user}
@@ -116,7 +117,7 @@ async function handleAuthSuccess() {
 							isAuthModalOpen = true;
 						}}
 					>
-						Sign In
+						{t("common_sign_in")}
 					</Button>
 				{/if}
 				<LanguageSwitch />
@@ -131,23 +132,23 @@ async function handleAuthSuccess() {
 				<div class="hero-icon" aria-hidden="true">
 					<svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
 				</div>
-				<h1 class="hero-title">The Book Club</h1>
+				<h1 class="hero-title">{t("app_name")}</h1>
 				<p class="hero-tagline">
-					Private reading circles with zero-friction onboarding and arcade energy.
+					{t("landing_hero_tagline")}
 				</p>
 			</div>
 
 			<Card padding="lg" class="landing-card">
 				<form onsubmit={handleJoinSubmit} class="join-form">
 					<div class="form-header">
-						<h2 class="form-title">Enter Club Code</h2>
-						<p class="form-subtitle">Type your 8-character invite code to jump straight into your reading group.</p>
+						<h2 class="form-title">{t("landing_welcome_title")}</h2>
+						<p class="form-subtitle">{t("landing_join_box_desc")}</p>
 					</div>
 
 					<Input
 						id="club-code-input"
-						label="Club Code"
-						placeholder="e.g. READ-4821"
+						label={t("landing_welcome_title")}
+						placeholder={t("landing_code_placeholder")}
 						maxlength={9}
 						bind:value={clubCode}
 						oninput={handleCodeInput}
@@ -162,14 +163,14 @@ async function handleAuthSuccess() {
 						fullWidth
 						disabled={isSubmitting}
 					>
-						Join Club
+						{isSubmitting ? t("landing_joining") : t("landing_join_button")}
 					</Button>
 				</form>
 			</Card>
 
 			<div class="secondary-actions">
 				<a href={ROUTES.CLUB_NEW} class="create-club-link">
-					Want to create your own club? Register here &rarr;
+					{t("landing_create_prompt")} {t("landing_create_link")} &rarr;
 				</a>
 			</div>
 		</div>
