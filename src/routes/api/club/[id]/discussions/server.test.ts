@@ -28,6 +28,7 @@ describe("Discussion API Endpoints (/api/club/[id]/discussions)", () => {
 		id: "user-commenter-1",
 		email: "commenter@example.com",
 		username: "BookWorm99",
+		userType: 2,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/worm99",
 		createdAt: 1000,

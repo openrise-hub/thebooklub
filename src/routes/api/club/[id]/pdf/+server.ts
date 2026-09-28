@@ -1,3 +1,4 @@
+import { USER_TYPE_PDF_UPLOADER } from "$lib/constants/auth";
 import {
 	generatePresignedDownload,
 	generatePresignedUpload,
@@ -13,6 +14,7 @@ export interface PdfUploadRequestBody {
 	cycleStatus?: "active" | "completed" | "purged";
 	existingPdfKey?: string | null;
 	userRole?: "admin" | "member";
+	userType?: number;
 }
 
 interface UploadEligibilityResult {
@@ -21,12 +23,15 @@ interface UploadEligibilityResult {
 	status?: number;
 }
 
-function validateUploadEligibility(body: PdfUploadRequestBody): UploadEligibilityResult {
-	const userRole = body.userRole ?? "admin";
-	if (userRole !== "admin") {
+function validateUploadEligibility(
+	body: PdfUploadRequestBody,
+	userType?: number,
+): UploadEligibilityResult {
+	const effectiveUserType = userType ?? body.userType;
+	if (effectiveUserType !== USER_TYPE_PDF_UPLOADER) {
 		return {
 			valid: false,
-			error: "Only club administrators can upload PDFs",
+			error: "Only authorized uploaders (user type 5) can upload PDFs",
 			status: 403,
 		};
 	}
@@ -82,7 +87,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ success: false, error: "Invalid JSON payload" }, { status: 400 });
 	}
 
-	const eligibility = validateUploadEligibility(body);
+	const eligibility = validateUploadEligibility(body, user.userType);
 	if (!eligibility.valid) {
 		return json(
 			{ success: false, error: eligibility.error },
@@ -168,9 +173,9 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 	}
 
 	const userRole = body.userRole ?? "admin";
-	if (userRole !== "admin") {
+	if (userRole !== "admin" && user.userType !== USER_TYPE_PDF_UPLOADER) {
 		return json(
-			{ success: false, error: "Only club administrators can delete PDFs" },
+			{ success: false, error: "Only club administrators or authorized uploaders can delete PDFs" },
 			{ status: 403 },
 		);
 	}

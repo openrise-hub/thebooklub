@@ -22,6 +22,7 @@ describe("POST /api/club/create", () => {
 		id: "user-admin-1",
 		email: "admin@example.com",
 		username: "club_founder",
+		userType: 2,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/admin",
 		createdAt: 1000,

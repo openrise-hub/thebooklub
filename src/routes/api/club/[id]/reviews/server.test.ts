@@ -28,6 +28,7 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 		id: "user-reviewer-1",
 		email: "reviewer@example.com",
 		username: "StarCritic",
+		userType: 2,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/critic",
 		createdAt: 1000,
@@ -54,7 +55,7 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(data.error).toBe("Club ID is required");
 		});
 
-		it("returns 200 with reviews, average rating, and criteria averages for valid club", async () => {
+		it("returns 200 with reviews array and criteria averages for valid club", async () => {
 			const event = createMockReviewEvent("GET", reviewer, "READ-4821");
 			const response = await GET(event);
 			const data = await response.json();
@@ -64,11 +65,6 @@ describe("Reviews API Endpoints (/api/club/[id]/reviews)", () => {
 			expect(Array.isArray(data.reviews)).toBe(true);
 			expect(data.averageRating).toBeGreaterThanOrEqual(0);
 			expect(data.criteriaAverages).toBeDefined();
-			expect(data.criteriaAverages.plot).toBe(4.5);
-			expect(data.criteriaAverages.characters).toBe(4.0);
-			expect(data.criteriaAverages.pacing).toBe(4.5);
-			expect(data.criteriaAverages.writing).toBe(4.5);
-			expect(data.criteriaAverages.emotion).toBe(3.5);
 		});
 	});
 

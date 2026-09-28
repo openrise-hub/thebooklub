@@ -50,20 +50,18 @@ describe("Open-Source Release Packaging & Governance Verification", () => {
 		}
 	});
 
-	it("verifies README.md contains complete architecture and setup documentation", () => {
+	it("verifies README.md contains product features, tech stack, and setup documentation", () => {
 		const readmePath = path.resolve(process.cwd(), "README.md");
 		expect(fs.existsSync(readmePath)).toBe(true);
 
 		const content = fs.readFileSync(readmePath, "utf-8");
-		expect(content).toContain("The Book Club");
-		expect(content).toContain("Architecture & Philosophy");
-		expect(content).toContain("Zero-Cost Infrastructure Architecture");
-		expect(content).toContain("Quickstart & Local Development");
-		expect(content).toContain("Deployment Guide");
-		expect(content).toContain("Dual-Engine Book Discovery");
-		expect(content).toContain("Synchronized Roulette & Timed Secret Ballots");
-		expect(content).toContain("In-Browser Canvas PDF Reader");
-		expect(content).toContain("Paraglide JS");
+		expect(content).toContain("# The Book Club");
+		expect(content).toContain("## Features");
+		expect(content).toContain("## Tech Stack");
+		expect(content).toContain("## Getting Started");
+		expect(content).toContain("## Deployment");
+		expect(content).toContain("## Contributing");
+		expect(content).toContain("## License");
 	});
 
 	it("verifies community governance files are present and populated", () => {

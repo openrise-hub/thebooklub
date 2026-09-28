@@ -27,6 +27,7 @@ describe("POST /api/club/[id]/cadence", () => {
 		id: "admin-user",
 		email: "admin@example.com",
 		username: "clubadmin",
+		userType: 2,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/admin",
 		createdAt: 1000,

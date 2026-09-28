@@ -1,3 +1,4 @@
+import { USER_TYPE_DEFAULT, USER_TYPE_PDF_UPLOADER } from "$lib/constants/auth";
 import { MAX_PDF_SIZE_BYTES } from "$lib/constants/storage";
 import type { UserSession } from "$lib/server/auth";
 import type { RequestEvent } from "@sveltejs/kit";
@@ -34,10 +35,11 @@ function createMockPdfEvent(options: {
 }
 
 describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
-	const adminUser: UserSession = {
+	const authorizedUploader: UserSession = {
 		id: "user-admin",
 		email: "admin@example.com",
 		username: "club_admin",
+		userType: USER_TYPE_PDF_UPLOADER,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/admin",
 		createdAt: 1000,
@@ -47,6 +49,7 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 		id: "user-member",
 		email: "member@example.com",
 		username: "club_member",
+		userType: USER_TYPE_DEFAULT,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/member",
 		createdAt: 2000,
@@ -71,7 +74,7 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 		expect(data.error).toContain("Authentication required");
 	});
 
-	it("rejects non-admin members with 403 Forbidden", async () => {
+	it("rejects non-uploader users (user type != 5) with 403 Forbidden", async () => {
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
 			user: regularMember,
@@ -88,13 +91,13 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 
 		expect(response.status).toBe(403);
 		expect(data.success).toBe(false);
-		expect(data.error).toContain("Only club administrators");
+		expect(data.error).toContain("Only authorized uploaders");
 	});
 
 	it("rejects upload when cycle is already completed", async () => {
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
-			user: adminUser,
+			user: authorizedUploader,
 			body: {
 				cycleId: "cycle-completed-1",
 				contentType: "application/pdf",
@@ -114,7 +117,7 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 	it("rejects upload when an active PDF already exists on the cycle", async () => {
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
-			user: adminUser,
+			user: authorizedUploader,
 			body: {
 				cycleId: "cycle-active-1",
 				contentType: "application/pdf",
@@ -135,7 +138,7 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 	it("rejects upload with non-PDF MIME type", async () => {
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
-			user: adminUser,
+			user: authorizedUploader,
 			body: {
 				cycleId: "cycle-active-1",
 				contentType: "application/zip",
@@ -154,7 +157,7 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 	it("rejects upload exceeding 25 MB size limit", async () => {
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
-			user: adminUser,
+			user: authorizedUploader,
 			body: {
 				cycleId: "cycle-active-1",
 				contentType: "application/pdf",
@@ -173,7 +176,7 @@ describe("PDF Upload Endpoint Guards (POST /api/club/[id]/pdf)", () => {
 	it("returns presigned upload URL and storage key on valid admin request", async () => {
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
-			user: adminUser,
+			user: authorizedUploader,
 			body: {
 				cycleId: "cycle-active-1",
 				contentType: "application/pdf",
@@ -199,6 +202,7 @@ describe("PDF Download Endpoint (GET /api/club/[id]/pdf)", () => {
 		id: "user-reader",
 		email: "reader@example.com",
 		username: "reader",
+		userType: USER_TYPE_DEFAULT,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/reader",
 		createdAt: 1000,
@@ -246,6 +250,7 @@ describe("PDF Deletion Endpoint (DELETE /api/club/[id]/pdf)", () => {
 		id: "user-admin",
 		email: "admin@example.com",
 		username: "club_admin",
+		userType: USER_TYPE_PDF_UPLOADER,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/admin",
 		createdAt: 1000,
@@ -262,9 +267,13 @@ describe("PDF Deletion Endpoint (DELETE /api/club/[id]/pdf)", () => {
 	});
 
 	it("rejects non-admin member deletion with 403", async () => {
+		const memberUser: UserSession = {
+			...adminUser,
+			userType: USER_TYPE_DEFAULT,
+		};
 		const event = createMockPdfEvent({
 			clubId: "READ-4821",
-			user: adminUser,
+			user: memberUser,
 			body: { userRole: "member" },
 		});
 

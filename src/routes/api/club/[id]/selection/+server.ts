@@ -4,7 +4,10 @@ import {
 	DEFAULT_SELECTION_MODE,
 	type SelectionMode,
 } from "$lib/constants/selection";
+import { getDb } from "$lib/server/db/index";
+import { selectionNominations, selectionPolls } from "$lib/server/db/schema";
 import { type RequestHandler, json } from "@sveltejs/kit";
+import { eq } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ params }) => {
 	const clubId = params.id;
@@ -12,11 +15,73 @@ export const GET: RequestHandler = async ({ params }) => {
 		return json({ error: "Missing club ID" }, { status: 400 });
 	}
 
+	const db = await getDb();
+	const nominations = await db
+		.select()
+		.from(selectionNominations)
+		.where(eq(selectionNominations.clubId, clubId));
+
+	const activePoll = await db
+		.select()
+		.from(selectionPolls)
+		.where(eq(selectionPolls.clubId, clubId))
+		.limit(1);
+
+	const candidates = nominations.map((n) => JSON.parse(n.bookData));
+
 	return json({
 		clubId,
-		session: null,
+		session:
+			activePoll.length > 0
+				? {
+						id: activePoll[0].id,
+						clubId,
+						mode: "poll",
+						status: activePoll[0].status,
+						candidates,
+						pollEndsAt: new Date(activePoll[0].expiresAt).toISOString(),
+						createdAt: new Date(activePoll[0].createdAt).toISOString(),
+					}
+				: null,
 	});
 };
+
+async function saveSelectionCandidates(
+	db: Awaited<ReturnType<typeof getDb>>,
+	clubId: string,
+	userId: string,
+	candidates: ReturnType<typeof createCandidateBook>[],
+	now: number,
+): Promise<void> {
+	await db.delete(selectionNominations).where(eq(selectionNominations.clubId, clubId));
+	for (let i = 0; i < candidates.length; i++) {
+		await db.insert(selectionNominations).values({
+			id: `nom-${crypto.randomUUID().slice(0, 8)}`,
+			clubId,
+			bookData: JSON.stringify(candidates[i]),
+			colorIndex: i,
+			nominatedBy: userId,
+			createdAt: now,
+		});
+	}
+}
+
+async function savePollSession(
+	db: Awaited<ReturnType<typeof getDb>>,
+	sessionId: string,
+	clubId: string,
+	pollEndsAt: number,
+	now: number,
+): Promise<void> {
+	await db.delete(selectionPolls).where(eq(selectionPolls.clubId, clubId));
+	await db.insert(selectionPolls).values({
+		id: sessionId,
+		clubId,
+		status: "active",
+		expiresAt: pollEndsAt,
+		createdAt: now,
+	});
+}
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	const user = locals.user;
@@ -65,22 +130,27 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	const candidates = rawCandidates.map((c, idx) => createCandidateBook(c, idx));
 	const pollDurationHours = Math.max(1, body.pollDurationHours || DEFAULT_POLL_HOURS);
 
-	const now = new Date();
-	const pollEndsAt =
-		mode === "poll"
-			? new Date(now.getTime() + pollDurationHours * 60 * 60 * 1000).toISOString()
-			: undefined;
+	const now = Date.now();
+	const pollEndsAt = now + pollDurationHours * 60 * 60 * 1000;
+	const sessionId = `selection-${now}`;
+
+	const db = await getDb();
+	await saveSelectionCandidates(db, clubId, user.id, candidates, now);
+
+	if (mode === "poll") {
+		await savePollSession(db, sessionId, clubId, pollEndsAt, now);
+	}
 
 	const session = {
-		id: `selection-${Date.now()}`,
+		id: sessionId,
 		clubId,
 		mode,
 		status: "active",
 		candidates,
 		pollDurationHours: mode === "poll" ? pollDurationHours : undefined,
-		pollEndsAt,
+		pollEndsAt: mode === "poll" ? new Date(pollEndsAt).toISOString() : undefined,
 		seed: Math.floor(Math.random() * 1000000),
-		createdAt: now.toISOString(),
+		createdAt: new Date(now).toISOString(),
 	};
 
 	return json({

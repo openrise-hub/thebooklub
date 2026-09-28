@@ -1,5 +1,8 @@
 import { calculateProgressPercent } from "$lib/club/progress";
+import { getDb } from "$lib/server/db/index";
+import { clubMembers, readingCycles } from "$lib/server/db/schema";
 import { type RequestHandler, json } from "@sveltejs/kit";
+import { and, eq } from "drizzle-orm";
 
 export interface ProgressRequestBody {
 	currentPage: number;
@@ -64,14 +67,21 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	}
 
 	const total = body.totalPages > 0 ? body.totalPages : 1;
-	const percent = calculateProgressPercent(body.currentPage, total);
+	const pageVal = Math.floor(body.currentPage);
+	const percent = calculateProgressPercent(pageVal, total);
 	const now = Date.now();
+
+	const db = await getDb();
+	await db
+		.update(clubMembers)
+		.set({ currentPage: pageVal })
+		.where(and(eq(clubMembers.clubId, clubId), eq(clubMembers.userId, user.id)));
 
 	return json({
 		success: true,
 		clubId,
 		userId: user.id,
-		currentPage: Math.floor(body.currentPage),
+		currentPage: pageVal,
 		totalPages: Math.floor(total),
 		percent,
 		updatedAt: now,
@@ -93,13 +103,30 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		);
 	}
 
+	const db = await getDb();
+	const member = await db
+		.select()
+		.from(clubMembers)
+		.where(and(eq(clubMembers.clubId, clubId), eq(clubMembers.userId, user.id)))
+		.limit(1);
+
+	const activeCycle = await db
+		.select()
+		.from(readingCycles)
+		.where(and(eq(readingCycles.clubId, clubId), eq(readingCycles.status, "active")))
+		.limit(1);
+
+	const currentPage = member.length > 0 ? member[0].currentPage : 0;
+	const totalPages = activeCycle.length > 0 ? activeCycle[0].bookPageCount : 100;
+	const percent = calculateProgressPercent(currentPage, totalPages);
+
 	return json({
 		success: true,
 		clubId,
 		userId: user.id,
-		currentPage: 184,
-		totalPages: 412,
-		percent: 45,
+		currentPage,
+		totalPages,
+		percent,
 		updatedAt: Date.now(),
 	});
 };

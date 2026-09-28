@@ -22,6 +22,13 @@ pnpm-debug.log*
 # Test coverage
 coverage/
 
+# Local databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+
 # Operating system files
 .DS_Store
 Thumbs.db
