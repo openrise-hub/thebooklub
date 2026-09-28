@@ -1,33 +1,9 @@
 import { validateDiscussionMessage } from "$lib/club/discussion";
+import { getDb } from "$lib/server/db/index";
+import { discussions } from "$lib/server/db/schema";
 import type { DiscussionMessage, DiscussionPostRequest } from "$lib/types/discussion";
 import { type RequestHandler, json } from "@sveltejs/kit";
-
-const mockDiscussionsStore: Record<string, DiscussionMessage[]> = {
-	"READ-4821": [
-		{
-			id: "msg-1",
-			clubId: "READ-4821",
-			cycleId: "cycle-1",
-			userId: "user-alice",
-			username: "AliceReader",
-			avatarUrl: "https://gravatar.com/avatar/alice?d=identicon",
-			content: "The opening worldbuilding completely hooked me! The sprawl is incredible.",
-			pageReference: 15,
-			createdAt: Date.now() - 3600000 * 5,
-		},
-		{
-			id: "msg-2",
-			clubId: "READ-4821",
-			cycleId: "cycle-1",
-			userId: "user-bob",
-			username: "BobBooks",
-			avatarUrl: "https://gravatar.com/avatar/bob?d=identicon",
-			content: "Case's motivation becomes much clearer around this milestone. What a ride.",
-			pageReference: 85,
-			createdAt: Date.now() - 3600000 * 2,
-		},
-	],
-};
+import { asc, eq } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	const user = locals.user;
@@ -44,12 +20,29 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		);
 	}
 
-	const messages = mockDiscussionsStore[clubId] ?? [];
+	const db = await getDb();
+	const records = await db
+		.select()
+		.from(discussions)
+		.where(eq(discussions.clubId, clubId))
+		.orderBy(asc(discussions.createdAt));
+
+	const messages: DiscussionMessage[] = records.map((r) => ({
+		id: r.id,
+		clubId: r.clubId,
+		cycleId: r.cycleId,
+		userId: r.userId,
+		username: r.username,
+		avatarUrl: r.avatarUrl,
+		content: r.content,
+		pageReference: r.pageReference,
+		createdAt: r.createdAt,
+	}));
 
 	return json({
 		success: true,
 		clubId,
-		messages: [...messages].sort((a, b) => a.createdAt - b.createdAt),
+		messages,
 	});
 };
 
@@ -80,22 +73,34 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ success: false, error: validation.error }, { status: 400 });
 	}
 
+	const db = await getDb();
+	const msgId = `msg-${crypto.randomUUID().slice(0, 8)}`;
+	const now = Date.now();
+	const cycleId = body.cycleId || "cycle-active";
+
 	const newMessage: DiscussionMessage = {
-		id: `msg-${crypto.randomUUID().slice(0, 8)}`,
+		id: msgId,
 		clubId,
-		cycleId: body.cycleId || "cycle-active",
+		cycleId,
 		userId: user.id,
 		username: user.username,
 		avatarUrl: user.avatarUrl,
 		content: body.content.trim(),
 		pageReference: Math.floor(body.pageReference),
-		createdAt: Date.now(),
+		createdAt: now,
 	};
 
-	if (!mockDiscussionsStore[clubId]) {
-		mockDiscussionsStore[clubId] = [];
-	}
-	mockDiscussionsStore[clubId].push(newMessage);
+	await db.insert(discussions).values({
+		id: msgId,
+		clubId,
+		cycleId,
+		userId: user.id,
+		username: user.username,
+		avatarUrl: user.avatarUrl,
+		content: body.content.trim(),
+		pageReference: Math.floor(body.pageReference),
+		createdAt: now,
+	});
 
 	return json({
 		success: true,

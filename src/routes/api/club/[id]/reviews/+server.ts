@@ -3,51 +3,11 @@ import {
 	calculateCriteriaAverages,
 	validateReview,
 } from "$lib/club/review";
+import { getDb } from "$lib/server/db/index";
+import { reviews } from "$lib/server/db/schema";
 import type { Review, ReviewPostRequest } from "$lib/types/review";
 import { type RequestHandler, json } from "@sveltejs/kit";
-
-const mockReviewsStore: Record<string, Review[]> = {
-	"READ-4821": [
-		{
-			id: "rev-1",
-			clubId: "READ-4821",
-			cycleId: "cycle-1",
-			userId: "user-alice",
-			username: "AliceReader",
-			avatarUrl: "https://gravatar.com/avatar/alice?d=identicon",
-			rating: 4.5,
-			comment: "Brilliant cyberpunk classic! The prose still holds up extraordinarily well.",
-			criteria: {
-				plot: 5,
-				characters: 4,
-				pacing: 4,
-				writing: 5,
-				emotion: 4,
-			},
-			createdAt: Date.now() - 3600000 * 24,
-			updatedAt: Date.now() - 3600000 * 24,
-		},
-		{
-			id: "rev-2",
-			clubId: "READ-4821",
-			cycleId: "cycle-1",
-			userId: "user-bob",
-			username: "BobBooks",
-			avatarUrl: "https://gravatar.com/avatar/bob?d=identicon",
-			rating: 4.0,
-			comment: "Fascinating vision of the future with tight narrative momentum.",
-			criteria: {
-				plot: 4,
-				characters: 4,
-				pacing: 5,
-				writing: 4,
-				emotion: 3,
-			},
-			createdAt: Date.now() - 3600000 * 12,
-			updatedAt: Date.now() - 3600000 * 12,
-		},
-	],
-};
+import { and, desc, eq } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	const user = locals.user;
@@ -64,9 +24,29 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		);
 	}
 
-	const reviews = mockReviewsStore[clubId] ?? [];
-	const averageRating = calculateAverageRating(reviews);
-	const criteriaAverages = calculateCriteriaAverages(reviews);
+	const db = await getDb();
+	const records = await db
+		.select()
+		.from(reviews)
+		.where(eq(reviews.clubId, clubId))
+		.orderBy(desc(reviews.createdAt));
+
+	const formattedReviews: Review[] = records.map((r) => ({
+		id: r.id,
+		clubId: r.clubId,
+		cycleId: r.cycleId,
+		userId: r.userId,
+		username: r.username,
+		avatarUrl: r.avatarUrl,
+		rating: r.rating,
+		comment: r.comment ?? undefined,
+		criteria: r.criteria ? JSON.parse(r.criteria) : undefined,
+		createdAt: r.createdAt,
+		updatedAt: r.createdAt,
+	}));
+
+	const averageRating = calculateAverageRating(formattedReviews);
+	const criteriaAverages = calculateCriteriaAverages(formattedReviews);
 
 	return json({
 		success: true,
@@ -74,10 +54,81 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		cycleId: "cycle-active",
 		averageRating,
 		criteriaAverages,
-		totalReviews: reviews.length,
-		reviews: [...reviews].sort((a, b) => b.createdAt - a.createdAt),
+		totalReviews: formattedReviews.length,
+		reviews: formattedReviews,
 	});
 };
+
+async function upsertReview(
+	db: Awaited<ReturnType<typeof getDb>>,
+	clubId: string,
+	cycleId: string,
+	user: NonNullable<Parameters<RequestHandler>[0]["locals"]["user"]>,
+	body: ReviewPostRequest,
+	now: number,
+): Promise<Review> {
+	const existing = await db
+		.select()
+		.from(reviews)
+		.where(
+			and(eq(reviews.clubId, clubId), eq(reviews.userId, user.id), eq(reviews.cycleId, cycleId)),
+		)
+		.limit(1);
+
+	if (existing.length > 0) {
+		const rec = existing[0];
+		await db
+			.update(reviews)
+			.set({
+				rating: body.rating,
+				comment: body.comment?.trim() || null,
+				criteria: body.criteria ? JSON.stringify(body.criteria) : null,
+			})
+			.where(eq(reviews.id, rec.id));
+
+		return {
+			id: rec.id,
+			clubId,
+			cycleId,
+			userId: user.id,
+			username: user.username,
+			avatarUrl: user.avatarUrl,
+			rating: body.rating,
+			comment: body.comment?.trim() || undefined,
+			criteria: body.criteria,
+			createdAt: rec.createdAt,
+			updatedAt: now,
+		};
+	}
+
+	const revId = `rev-${crypto.randomUUID().slice(0, 8)}`;
+	await db.insert(reviews).values({
+		id: revId,
+		clubId,
+		cycleId,
+		userId: user.id,
+		username: user.username,
+		avatarUrl: user.avatarUrl,
+		rating: body.rating,
+		comment: body.comment?.trim() || null,
+		criteria: body.criteria ? JSON.stringify(body.criteria) : null,
+		createdAt: now,
+	});
+
+	return {
+		id: revId,
+		clubId,
+		cycleId,
+		userId: user.id,
+		username: user.username,
+		avatarUrl: user.avatarUrl,
+		rating: body.rating,
+		comment: body.comment?.trim() || undefined,
+		criteria: body.criteria,
+		createdAt: now,
+		updatedAt: now,
+	};
+}
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	const user = locals.user;
@@ -106,43 +157,11 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ success: false, error: validation.error }, { status: 400 });
 	}
 
-	if (!mockReviewsStore[clubId]) {
-		mockReviewsStore[clubId] = [];
-	}
-
-	const existingIndex = mockReviewsStore[clubId].findIndex(
-		(r) => r.userId === user.id && r.cycleId === (body.cycleId || "cycle-active"),
-	);
-
+	const db = await getDb();
+	const cycleId = body.cycleId || "cycle-active";
 	const now = Date.now();
-	let savedReview: Review;
 
-	if (existingIndex >= 0) {
-		const existing = mockReviewsStore[clubId][existingIndex];
-		savedReview = {
-			...existing,
-			rating: body.rating,
-			comment: body.comment?.trim() || undefined,
-			criteria: body.criteria,
-			updatedAt: now,
-		};
-		mockReviewsStore[clubId][existingIndex] = savedReview;
-	} else {
-		savedReview = {
-			id: `rev-${crypto.randomUUID().slice(0, 8)}`,
-			clubId,
-			cycleId: body.cycleId || "cycle-active",
-			userId: user.id,
-			username: user.username,
-			avatarUrl: user.avatarUrl,
-			rating: body.rating,
-			comment: body.comment?.trim() || undefined,
-			criteria: body.criteria,
-			createdAt: now,
-			updatedAt: now,
-		};
-		mockReviewsStore[clubId].push(savedReview);
-	}
+	const savedReview = await upsertReview(db, clubId, cycleId, user, body, now);
 
 	return json({
 		success: true,

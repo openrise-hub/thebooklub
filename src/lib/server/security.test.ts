@@ -1,3 +1,4 @@
+import { USER_TYPE_DEFAULT, USER_TYPE_PDF_UPLOADER } from "$lib/constants/auth";
 import type { UserSession } from "$lib/server/auth";
 import { createSessionToken, verifySessionToken } from "$lib/server/auth";
 import { validateEnv } from "$lib/server/env";
@@ -22,6 +23,7 @@ const mockAdminUser: UserSession = {
 	id: "user-admin-1",
 	email: "admin@club.example.com",
 	username: "ClubAdmin",
+	userType: USER_TYPE_PDF_UPLOADER,
 	isEmailVerified: true,
 	avatarUrl: "https://gravatar.com/avatar/admin",
 	createdAt: Math.floor(Date.now() / 1000),
@@ -31,6 +33,7 @@ const mockMemberUser: UserSession = {
 	id: "user-member-2",
 	email: "member@club.example.com",
 	username: "ClubMember",
+	userType: USER_TYPE_DEFAULT,
 	isEmailVerified: true,
 	avatarUrl: "https://gravatar.com/avatar/member",
 	createdAt: Math.floor(Date.now() / 1000),
@@ -100,7 +103,7 @@ describe("Security Audit: Role-Based Access Control (RBAC)", () => {
 
 			expect(response.status).toBe(403);
 			expect(data.success).toBe(false);
-			expect(data.error).toContain("Only club administrators");
+			expect(data.error).toContain("Only authorized uploaders");
 		});
 
 		it("Cadence Update (/api/club/[id]/cadence) rejects unauthenticated requests with 401", async () => {
@@ -366,6 +369,7 @@ describe("Security Audit: Cryptographic Token Tamper Resistance", () => {
 		expect(session?.id).toBe(mockAdminUser.id);
 		expect(session?.email).toBe(mockAdminUser.email);
 		expect(session?.username).toBe(mockAdminUser.username);
+		expect(session?.userType).toBe(mockAdminUser.userType);
 	});
 
 	it("rejects token with altered payload bytes", async () => {

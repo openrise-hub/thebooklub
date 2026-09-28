@@ -2,6 +2,8 @@ import { generateInviteCode } from "$lib/club/generator";
 import { CADENCE_TYPES, type CadenceType } from "$lib/constants/cadence";
 import { CLUB_NAME_MAX_LENGTH, CLUB_NAME_MIN_LENGTH } from "$lib/constants/club";
 import { ROUTES } from "$lib/constants/routes";
+import { getDb } from "$lib/server/db/index";
+import { clubMembers, clubs } from "$lib/server/db/schema";
 import { type RequestHandler, json } from "@sveltejs/kit";
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -48,6 +50,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const advancedReviews = Boolean(body.advancedReviews);
 	const inviteCode = generateInviteCode();
+	const now = Math.floor(Date.now() / 1000);
+
+	const db = await getDb();
+	await db.insert(clubs).values({
+		id: inviteCode,
+		name,
+		cadence,
+		inviteCode,
+		advancedReviews,
+		createdBy: user.id,
+		createdAt: now,
+	});
+
+	await db.insert(clubMembers).values({
+		id: `mem-${crypto.randomUUID().slice(0, 8)}`,
+		clubId: inviteCode,
+		userId: user.id,
+		role: "admin",
+		currentPage: 0,
+		joinedAt: now,
+	});
 
 	return json({
 		success: true,

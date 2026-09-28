@@ -16,6 +16,7 @@ describe("Club Dashboard Server Load", () => {
 		id: "user-test-1",
 		email: "reader@example.com",
 		username: "book_worm",
+		userType: 2,
 		isEmailVerified: true,
 		avatarUrl: "https://gravatar.com/avatar/test",
 		createdAt: 1000,

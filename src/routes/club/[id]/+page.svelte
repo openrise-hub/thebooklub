@@ -317,7 +317,7 @@ onDestroy(() => {
 								<DiscussionFeed
 									clubId={data.club.id}
 									cycleId={data.activeCycle.id}
-									currentUser={data.members.length > 0 ? { id: data.members[0].id, email: "user@example.com", username: data.members[0].username, isEmailVerified: true, avatarUrl: data.members[0].avatarUrl, createdAt: 1000 } : null}
+									currentUser={data.members.length > 0 ? { id: data.members[0].id, email: "user@example.com", username: data.members[0].username, userType: 2, isEmailVerified: true, avatarUrl: data.members[0].avatarUrl, createdAt: 1000 } : null}
 									currentReadingPage={userProgress?.page || 0}
 									totalPages={data.activeCycle.book.pageCount || 1}
 								/>

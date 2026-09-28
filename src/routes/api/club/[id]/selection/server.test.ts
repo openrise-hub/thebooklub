@@ -14,6 +14,7 @@ function createMockSelectionEvent(options: {
 			id: "user-1",
 			email: "admin@club.com",
 			username: "AdminUser",
+			userType: 42,
 			isEmailVerified: true,
 			avatarUrl: "",
 			createdAt: Date.now(),
