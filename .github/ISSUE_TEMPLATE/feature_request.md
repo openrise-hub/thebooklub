@@ -12,8 +12,8 @@ A concise description of the proposed feature.
 ## Problem Statement
 What problem does this solve?
 
-## Roadmap Association
-Which milestone in ROADMAP.md does this relate to?
+## Functional Area
+Which functional area does this relate to (e.g., Reader, Discussions, Reviews, Selection, Auth)?
 
 ## Proposed Behavior
 A clear, factual summary of how the feature should behave.

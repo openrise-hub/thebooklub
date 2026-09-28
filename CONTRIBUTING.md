@@ -1,48 +1,41 @@
 # Contributing to The Book Club
 
-Thank you for your interest in contributing to The Book Club. This project is open source and licensed under the GNU General Public License v3.0 (GPLv3).
+Thanks for helping out! The Book Club is open source under the GNU General Public License v3.0 (GPLv3).
 
 ## Code of Conduct
 
-All contributors and maintainers are expected to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
+Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) in all project spaces.
 
-## Development Setup
+## Setup
 
-1. **Prerequisites:**
-   - Node.js (v20 or newer)
-   - npm
-
-2. **Installation:**
+1. **Requirements:** Node.js 22+ and npm 10+.
+2. **Install:**
    ```bash
    npm install --ignore-scripts
    ```
-
-3. **Development Server:**
+3. **Run locally:**
    ```bash
    npm run dev
    ```
 
-4. **Static Analysis & Testing:**
-   ```bash
-   # Linting and formatting
-   npx @biomejs/biome check --write
+## Checks & Tests
 
-   # Type checking
-   npx svelte-check --tsconfig ./tsconfig.json
+Run these before opening a pull request:
 
-   # Unit test runner
-   npx vitest run
-   ```
+```bash
+# Format and lint
+npm run lint
 
-## Development Guidelines
+# Type check
+npm run check
 
-- **Design System:** Follow the tactile geometric design system defined in `PROJECT.md`. Never use gradients, glows, or blurry drop shadows.
-- **Dependencies:** All dependencies must be pinned to exact versions with no floating ranges (`^` or `~`). New dependencies require maintainer approval.
-- **Constants:** Never hardcode numbers or strings. Centralize all thresholds and settings in `src/lib/constants/`.
-- **Commit Messages:** Follow the Conventional Commits format as specified in `AGENTS.md`.
+# Tests
+npm run test
+```
 
-## Pull Request Process
+## Pull Requests
 
-1. Create a descriptive feature branch from `main`.
-2. Ensure all lint checks, type checks, and tests pass before submitting.
-3. Open a Pull Request using the provided pull request template.
+1. Branch off `main` with a short, descriptive name.
+2. Write commit messages following Conventional Commits (`type(scope): subject`).
+3. Add unit tests for new logic or fixes.
+4. Open a pull request using the default template.
