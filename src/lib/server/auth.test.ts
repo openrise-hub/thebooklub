@@ -12,6 +12,7 @@ const mockUser: UserSession = {
 	id: "user-123",
 	email: "reader@example.com",
 	username: "BookWorm",
+	userType: 2,
 	isEmailVerified: true,
 	avatarUrl: "https://www.gravatar.com/avatar/abc?d=retro&s=120",
 	createdAt: Math.floor(Date.now() / 1000),

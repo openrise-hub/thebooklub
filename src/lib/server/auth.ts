@@ -14,6 +14,7 @@ export interface UserSession {
 	id: string;
 	email: string;
 	username: string;
+	userType: number;
 	isEmailVerified: boolean;
 	avatarUrl: string;
 	createdAt: number;
