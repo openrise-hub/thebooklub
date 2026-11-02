@@ -2,7 +2,7 @@
 import { page } from "$app/state";
 import { t } from "$lib/i18n";
 import type { UserSession } from "$lib/server/auth";
-import { SignIn, SignUp } from "svelte-clerk";
+import { SignIn, SignUp, useClerkContext } from "svelte-clerk";
 import Button from "./Button.svelte";
 import Input from "./Input.svelte";
 import Modal from "./Modal.svelte";
@@ -15,6 +15,23 @@ interface Props {
 }
 
 let { isOpen = false, pendingCode = "", onclose, onsuccess }: Props = $props();
+
+let clerkCtx: ReturnType<typeof useClerkContext> | null = null;
+try {
+	clerkCtx = useClerkContext();
+} catch {
+	clerkCtx = null;
+}
+
+$effect(() => {
+	if (isOpen && page.data?.authProvider === "clerk" && clerkCtx) {
+		const userId = clerkCtx.auth?.userId;
+		if (userId) {
+			handleClose();
+			window.location.href = pendingCode ? `/club/${pendingCode}` : "/";
+		}
+	}
+});
 
 let mode = $state<"login" | "register">("register");
 let email = $state("");
