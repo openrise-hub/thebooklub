@@ -5,6 +5,7 @@ import {
 	isProtectedRoute,
 	verifySessionToken,
 } from "$lib/server/auth";
+import { resolveClerkUser } from "$lib/server/clerk";
 import { validateEnv } from "$lib/server/env";
 import { resolveLocaleFromRequest, transformHtmlLang } from "$lib/server/i18n";
 import { type Handle, type RequestEvent, redirect } from "@sveltejs/kit";
@@ -36,11 +37,22 @@ function handleAccessGuard(event: RequestEvent, user: UserSession | null): Respo
 	return null;
 }
 
-export const handle: Handle = async ({ event, resolve }) => {
-	const serverEnv = validateEnv(env);
+async function authenticateRequest(
+	event: RequestEvent,
+	serverEnv: ReturnType<typeof validateEnv>,
+): Promise<UserSession | null> {
+	if (serverEnv.AUTH_PROVIDER === "clerk") {
+		const clerkUser = await resolveClerkUser(event.request, serverEnv);
+		if (clerkUser) return clerkUser;
+	}
 
 	const token = extractSessionToken(event);
-	const user = token ? await verifySessionToken(token, serverEnv.AUTH_SECRET) : null;
+	return token ? await verifySessionToken(token, serverEnv.AUTH_SECRET) : null;
+}
+
+export const handle: Handle = async ({ event, resolve }) => {
+	const serverEnv = validateEnv(env);
+	const user = await authenticateRequest(event, serverEnv);
 	const locale = resolveLocaleFromRequest(event);
 
 	event.locals.user = user;

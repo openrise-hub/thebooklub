@@ -1,6 +1,8 @@
 <script lang="ts">
+import { page } from "$app/state";
 import { t } from "$lib/i18n";
 import type { UserSession } from "$lib/server/auth";
+import { SignIn, SignUp } from "svelte-clerk";
 import Button from "./Button.svelte";
 import Input from "./Input.svelte";
 import Modal from "./Modal.svelte";
@@ -125,93 +127,111 @@ function handleGoogleOAuth() {
 			</button>
 		</div>
 
-		<Button
-			variant="neutral"
-			fullWidth
-			onclick={handleGoogleOAuth}
-			disabled={isLoading}
-		>
-			<span class="google-btn-content">
-				<svg class="google-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-					<path
-						fill="#EA4335"
-						d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
+		{#if page.data?.authProvider === "clerk"}
+			<div class="clerk-auth-wrapper">
+				{#if mode === "register"}
+					<SignUp
+						routing="hash"
+						fallbackRedirectUrl={pendingCode ? `/club/${pendingCode}` : "/"}
+						forceRedirectUrl={pendingCode ? `/club/${pendingCode}` : "/"}
 					/>
-					<path
-						fill="#4285F4"
-						d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"
+				{:else}
+					<SignIn
+						routing="hash"
+						fallbackRedirectUrl={pendingCode ? `/club/${pendingCode}` : "/"}
+						forceRedirectUrl={pendingCode ? `/club/${pendingCode}` : "/"}
 					/>
-					<path
-						fill="#FBBC05"
-						d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.1s.7 5.4 1.9 7.8l3.7-2.9z"
-					/>
-					<path
-						fill="#34A853"
-						d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
-					/>
-				</svg>
-				{t("auth_continue_google")}
-			</span>
-		</Button>
+				{/if}
+			</div>
+		{:else}
+			<Button
+				variant="neutral"
+				fullWidth
+				onclick={handleGoogleOAuth}
+				disabled={isLoading}
+			>
+				<span class="google-btn-content">
+					<svg class="google-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<path
+							fill="#EA4335"
+							d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
+						/>
+						<path
+							fill="#4285F4"
+							d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"
+						/>
+						<path
+							fill="#FBBC05"
+							d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.1s.7 5.4 1.9 7.8l3.7-2.9z"
+						/>
+						<path
+							fill="#34A853"
+							d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
+						/>
+					</svg>
+					{t("auth_continue_google")}
+				</span>
+			</Button>
 
-		<div class="divider">
-			<span class="divider-line"></span>
-			<span class="divider-text">{t("common_or").toUpperCase()}</span>
-			<span class="divider-line"></span>
-		</div>
+			<div class="divider">
+				<span class="divider-line"></span>
+				<span class="divider-text">{t("common_or").toUpperCase()}</span>
+				<span class="divider-line"></span>
+			</div>
 
-		<form onsubmit={handleSubmit} class="auth-form">
-			{#if errorMessage}
-				<div class="error-alert" role="alert">
-					{errorMessage}
-				</div>
-			{/if}
+			<form onsubmit={handleSubmit} class="auth-form">
+				{#if errorMessage}
+					<div class="error-alert" role="alert">
+						{errorMessage}
+					</div>
+				{/if}
 
-			{#if mode === "register"}
+				{#if mode === "register"}
+					<Input
+						id="auth-username"
+						label={t("auth_username_label")}
+						placeholder="reader_hero"
+						bind:value={username}
+						required
+						disabled={isLoading}
+					/>
+				{/if}
+
 				<Input
-					id="auth-username"
-					label={t("auth_username_label")}
-					placeholder="reader_hero"
-					bind:value={username}
+					id="auth-email"
+					label={t("auth_email_label")}
+					type="email"
+					placeholder="you@example.com"
+					bind:value={email}
 					required
 					disabled={isLoading}
 				/>
-			{/if}
 
-			<Input
-				id="auth-email"
-				label={t("auth_email_label")}
-				type="email"
-				placeholder="you@example.com"
-				bind:value={email}
-				required
-				disabled={isLoading}
-			/>
+				<Input
+					id="auth-password"
+					label={t("auth_password_label")}
+					type="password"
+					placeholder="••••••••"
+					bind:value={password}
+					required
+					disabled={isLoading}
+				/>
 
-			<Input
-				id="auth-password"
-				label={t("auth_password_label")}
-				type="password"
-				placeholder="••••••••"
-				bind:value={password}
-				required
-				disabled={isLoading}
-			/>
-
-			<Button
-				type="submit"
-				variant="purple"
-				size="lg"
-				fullWidth
-				disabled={isLoading}
-			>
-				{isLoading
-					? t("common_loading")
-					: mode === "register"
-						? (pendingCode ? `${t("auth_create_account_tab")} & ${t("common_join")}` : t("auth_create_account_tab"))
-						: (pendingCode ? `${t("auth_sign_in_tab")} & ${t("common_join")}` : t("auth_sign_in_tab"))}
-			</Button>
-		</form>
+				<Button
+					type="submit"
+					variant="purple"
+					size="lg"
+					fullWidth
+					disabled={isLoading}
+				>
+					{isLoading
+						? t("common_loading")
+						: mode === "register"
+							? (pendingCode ? `${t("auth_create_account_tab")} & ${t("common_join")}` : t("auth_create_account_tab"))
+							: (pendingCode ? `${t("auth_sign_in_tab")} & ${t("common_join")}` : t("auth_sign_in_tab"))}
+				</Button>
+			</form>
+		{/if}
 	</div>
 </Modal>
 
@@ -220,6 +240,13 @@ function handleGoogleOAuth() {
 		display: flex;
 		flex-direction: column;
 		gap: 20px;
+	}
+
+	.clerk-auth-wrapper {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
 	}
 
 	.invite-banner {
