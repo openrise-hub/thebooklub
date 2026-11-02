@@ -15,7 +15,7 @@ describe("Deployment & Infrastructure Configuration", () => {
 			(c: { path: string }) => c.path === "/api/cron/purge",
 		);
 		expect(purgeCron).toBeDefined();
-		expect(purgeCron?.schedule).toBe("0 * * * *");
+		expect(purgeCron?.schedule).toBe("0 0 * * *");
 	});
 
 	it("validates wrangler.toml Cloudflare Pages and R2 bindings", () => {
